@@ -1,0 +1,16 @@
+---
+title: "loess_plots"
+author: "Kevin Ren"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(readr)
+library(dplyr)
+library(ggplot2)
+
+llama_data <- read.csv("llama_deciles.csv")
+gpt_data <- read.csv("gpt_deciles.csv")
+```

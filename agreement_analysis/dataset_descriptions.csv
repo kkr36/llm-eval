@@ -1,0 +1,32 @@
+"Dataset Name","Short Description", "Source"
+acsincome,"ACSIncome task from the folktables package.", https://github.com/socialfoundations/folktables
+acsmobility,"ACSMobility task from the folktables package.", https://github.com/socialfoundations/folktables
+acspubcov,"ACSPublicCoverage task from the folktables package.", https://github.com/socialfoundations/folktables
+acstraveltime,"ACSTravelTime task from the folktables package.", https://github.com/socialfoundations/folktables
+acsunemployment,"ACSEmployment task from the folktables package.", https://github.com/socialfoundations/folktables
+airline,"The task is to predict whether a given flight will be delayed, given the information of the scheduled departure.", https://www.openml.org/search?type=data&status=active&id=42493
+bank,"The data is related with direct marketing campaigns (phone calls) of a Portuguese banking institution. The classification goal is to predict if the client will subscribe a term deposit (variable y).", https://www.openml.org/search?type=data&status=active&id=1558
+brfssdiabetes,"Predict whether a patient from the BRFSS survey has been told that they have diabetes before.", https://github.com/mlfoundations/tableshift
+brfsshbp,"Predict the hypertension diagnosis for high-risk age 50+ individuals from the BRFSS survey.", https://github.com/mlfoundations/tableshift
+brfsshighcholesterol,"Predict whether an individual from the BRFSS survey has high cholesterol.", https://github.com/mlfoundations/tableshift
+car,"Predict whether a car was considered in acceptable condition, according to car evaluation records derived from a hierarchical decision-making model.", https://archive.ics.uci.edu/dataset/19/car+evaluation
+diabetes,"Determine whether a patient who has diabetes was readmitted to the hospital within 30 days of discharge.", https://archive.ics.uci.edu/dataset/296/diabetes+130-us+hospitals+for+years+1999-2008
+glioma,"Determine the grade class information for a glioma (brain tumor)", https://archive.ics.uci.edu/dataset/759/glioma+grading+clinical+and+mutation+features+dataset
+houses,"Predict whether the median housing value for a California census block from the 1990 Census is greater than $200,000.", https://www.openml.org/search?type=data&status=active&id=537
+indiandiabetes,"This dataset is originally from the National Institute of Diabetes and Digestive and Kidney Diseases. The objective of the dataset is to diagnostically predict whether or not a patient has diabetes, based on certain diagnostic measurements included in the dataset.", https://www.kaggle.com/datasets/uciml/pima-indians-diabetes-database
+ipums,"Predict whether a given birth from one of 6 countries in Latin/Caribbean countries took place in a medical facility.", https://globalhealth.ipums.org/
+mushroom,"The goal is to determine whether a mushroom is edible or poisonous given physical and environmental characteristics of different mushroom species.", https://archive.ics.uci.edu/dataset/73/mushroom
+nursery,"Classify a dataset of nursery school application evaluations from Slovenia in the 1980s as priority (highest ranking) or not.", https://archive.ics.uci.edu/dataset/76/nursery
+rice,Classify a dataset of rice grains grown in Turkey as either the Osmancik species or the Cammeo species., https://archive.ics.uci.edu/dataset/545/rice+cammeo+and+osmancik
+sepsis,"Predict whether a set of ICU patient records in the US correspond to people who will contract sepsis within 6 hours.", https://github.com/mlfoundations/tableshift
+support2,"Given critically ill patients across 5 United States medical centers, accessioned throughout 1989-1991 and 1992-1994, predict if they died in the hospital.", https://archive.ics.uci.edu/dataset/880/support2
+taxibog,"Given taxi routes, Uber and Cabify from Bogota, predict whether the total ride duration time exceed 30 minutes (1800 seconds).", https://www.kaggle.com/datasets/mnavas/taxi-routes-for-mexico-city-and-quito
+taximex,"Given taxi routes, Uber and Cabify from Mexico City, predict whether the total ride duration time exceed 30 minutes (1800 seconds).", https://www.kaggle.com/datasets/mnavas/taxi-routes-for-mexico-city-and-quito
+taxiuio,"Given taxi routes, Uber and Cabify from Quito, predict whether the total ride duration time exceed 30 minutes (1800 seconds).", https://www.kaggle.com/datasets/mnavas/taxi-routes-for-mexico-city-and-quito
+telescope,"Discriminate between registrations of high-energy gamma particles caused by primary gammas (signal) from the images of hadronic showers initiated by cosmic rays in the upper atmosphere (background).", https://archive.ics.uci.edu/dataset/159/magic+gamma+telescope
+ucibreastcancer,"Predict whether a breast mass is malignant or benign.", https://archive.ics.uci.edu/dataset/15/breast+cancer+wisconsin+original
+ucidiabetes,"Predict whether someone has diabetes or prediabetes given healthcare and lifestyle statistics.", https://archive.ics.uci.edu/dataset/15/breast+cancer+wisconsin+original
+uciheart,"Predict diagnosis of heart disease based on multiple indicators.", https://archive.ics.uci.edu/dataset/45/heart+disease
+ucispambase,"Classify emails as spam or not spam based on word frequencies in the email.", https://archive.ics.uci.edu/dataset/94/spambase
+ucistatloggerman,"Classify people described by a set of attributes as good or bad credit risks", https://archive.ics.uci.edu/dataset/144/statlog+german+credit+data
+usaccidents,"Predict whether a traffic accident was considered to cause significant / major traffic impact.", https://www.kaggle.com/datasets/sobhanmoosavi/us-accidents
