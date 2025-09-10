@@ -1,0 +1,15 @@
+huggingface_hub
+matplotlib
+numpy
+openai
+pandas
+pytest
+rpy2
+scikit-learn
+scipy
+seaborn
+statsmodels
+torch
+tqdm
+transformers
+xgboost
