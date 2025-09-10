@@ -1,3 +1,5 @@
+import pdb
+
 import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
@@ -34,12 +36,8 @@ if __name__ == "__main__":
                 subset = metrics_df[metrics_df[col] >= lower_bound]
                 aucs = np.mean(subset["auc"])
                 if lower_bound >= 0.4 and col == "std_risk_scores":
-                    import pdb
-
                     pdb.set_trace()
                 if lower_bound == min_metric and col == "std_risk_scores":
-                    import pdb
-
                     pdb.set_trace()
 
                 datapoints.append([lower_bound, aucs, len(subset)])

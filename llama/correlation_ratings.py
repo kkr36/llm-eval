@@ -3,6 +3,8 @@ import os
 import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import r2_score
 
 
 # expnames = ["auc", "auc_logprob", "probs", "probs_logprob", "score", "score_logprob"]
@@ -24,9 +26,6 @@ if __name__ == "__main__":
         # plotting
 
         xname = expname if "auc" not in expname else expname.replace("auc", "predicted_auc")
-
-        from sklearn.linear_model import LinearRegression
-        from sklearn.metrics import r2_score
 
         model = LinearRegression()
         X, y = np.array(results).reshape(-1, 1), np.array(auc)

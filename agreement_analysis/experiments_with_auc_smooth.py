@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import scipy.stats
 from matplotlib import pyplot as plt
 from scipy.interpolate import interp1d
 from statsmodels.nonparametric.smoothers_lowess import lowess
@@ -85,8 +86,6 @@ if __name__ == "__main__":
                 x, y, frac=0.4, grid=x_grid, n_boot=1000, alpha=0.1
             )
             plt.fill_between(x_grid, ci_lower, ci_upper, color="C0", alpha=0.2, label=f"{llm} 95% CI")
-
-            import scipy.stats
 
             scipy.stats.spearmanr(x, y)
             plt.xlabel(f"{exp_name_map[col]}")

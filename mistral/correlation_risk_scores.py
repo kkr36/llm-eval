@@ -6,6 +6,8 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import r2_score
 
 
 risk_scores_dir = Path("llama_zero_shot")
@@ -38,9 +40,6 @@ if __name__ == "__main__":
         # regress risk scores on label
         risk_scores = risk_score_df["risk_score"].tolist()
         labels = risk_score_df["label"].tolist()
-
-        from sklearn.linear_model import LinearRegression
-        from sklearn.metrics import r2_score
 
         model = LinearRegression()
         X, y = np.array(risk_scores).reshape(-1, 1), np.array(labels)
@@ -83,9 +82,6 @@ if __name__ == "__main__":
         plt.xticks([1], [name])  # Label for the single box
         plt.grid(True)
         plt.savefig(f"calibration_regression/box_plot_{name}.png")
-
-    from sklearn.linear_model import LinearRegression
-    from sklearn.metrics import r2_score
 
     model = LinearRegression()
     X, y = np.array([x[2] for x in datapoints]).reshape(-1, 1), np.array([x[1] for x in datapoints])

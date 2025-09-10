@@ -1,6 +1,8 @@
 import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import r2_score
 
 
 if __name__ == "__main__":
@@ -13,9 +15,6 @@ if __name__ == "__main__":
 
         x_col = merged_df["confidence_score"]
         y_col = merged_df["std_risk_scores"].tolist()
-
-        from sklearn.linear_model import LinearRegression
-        from sklearn.metrics import r2_score
 
         model = LinearRegression()
         X, y = np.array(x_col).reshape(-1, 1), np.array(y_col)

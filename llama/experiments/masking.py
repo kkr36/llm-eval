@@ -5,6 +5,7 @@ Problems:
 - what if each feature has a distinct number of options - if dataset A had many more options than dataset B, don't we just trivially expect lower scores from dataset A?
 """
 
+import pdb
 import pickle
 import random
 
@@ -95,8 +96,6 @@ def execute_experiment(
     # sample_size = min(10, len(usable_columns_map))
     # sampled_cols = random.sample(sorted(list(usable_columns_map.items())), sample_size)
 
-    import pickle
-
     with open(f"xgb_pickles/{config.dataset}.pickle", "rb") as handle:
         gpt_res = pickle.load(handle)
     sampled_cols = [
@@ -149,8 +148,6 @@ def execute_experiment(
                     filtered_data[col.name] = pd.to_datetime(filtered_data[col.name])
                     median = filtered_data[col.name].median()
             except:
-                import pdb
-
                 pdb.set_trace()
             filtered_data[final_col_name] = (filtered_data[col.name] > median).astype(
                 int

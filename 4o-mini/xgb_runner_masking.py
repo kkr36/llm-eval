@@ -1,5 +1,6 @@
 import importlib
 import os
+import pdb
 import pickle
 from pathlib import Path
 
@@ -107,8 +108,6 @@ if __name__ == "__main__":
                         filtered_test[col] = pd.to_datetime(filtered_test[col])
                         median = filtered_data[col].median()
                 except:
-                    import pdb
-
                     pdb.set_trace()
                 try:
                     filtered_train[final_col_name] = (filtered_train[col] > median).astype(
@@ -118,8 +117,6 @@ if __name__ == "__main__":
                         int
                     )  # if median above, say 1; otherwise 0
                 except:
-                    import pdb
-
                     pdb.set_trace()
 
             else:  # categorical variable; take the mode and binarize this

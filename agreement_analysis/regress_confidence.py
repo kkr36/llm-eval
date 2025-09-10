@@ -1,6 +1,10 @@
+import os
+
 import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import r2_score
 
 
 plt.rc("axes", titlesize=26)
@@ -26,9 +30,6 @@ if __name__ == "__main__":
             for j, col2 in enumerate(experiment_cols[i + 1 :]):
                 x_col = merged_df[col1]
                 y_col = merged_df[col2].tolist()
-
-                from sklearn.linear_model import LinearRegression
-                from sklearn.metrics import r2_score
 
                 model = LinearRegression()
                 X, y = np.array(x_col).reshape(-1, 1), np.array(y_col)
@@ -56,8 +57,6 @@ if __name__ == "__main__":
                 plt.xlabel(col1)
                 plt.ylabel(col2)
                 plt.tight_layout()
-                import os
-
                 if not os.path.exists(f"regress_confidence/{llm_path}"):
                     os.makedirs(f"regress_confidence/{llm_path}")
                 plt.savefig(f"regress_confidence/{llm_path}/{col1}_{col2}.pdf", format="pdf", bbox_inches="tight")

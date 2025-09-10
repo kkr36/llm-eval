@@ -1,5 +1,6 @@
 import importlib
 import os
+import pdb
 from pathlib import Path
 
 import pandas as pd
@@ -83,8 +84,6 @@ if __name__ == "__main__":
         # collect auc
         auc = roc_auc_score(y_test.to_numpy(), probs)
         if auc == 1:
-            import pdb
-
             pdb.set_trace()
         auc_per_dataset[dataset_name] = auc
 

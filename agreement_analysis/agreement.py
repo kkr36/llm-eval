@@ -1,6 +1,10 @@
+import os
+
 import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import r2_score
 
 
 plt.rc("axes", titlesize=20)
@@ -16,8 +20,6 @@ if __name__ == "__main__":
     # assert(set(llama['dataset_name'].tolist()) == set(gpt['dataset_name'].tolist()))
 
     dfs = [(llama, "Llama"), (gpt, "GPT"), (gpt_4o, "GPT 4o"), (mistral, "Mistral")]
-    import os
-
     for i, (df1, name1) in enumerate(dfs):
         for df2, name2 in dfs[i + 1 :]:
             folder = f"agreement_plots_category/{name1}_{name2}"
@@ -42,9 +44,6 @@ if __name__ == "__main__":
                 if "Unnamed" in col:
                     continue
                 llama_col, gpt_col = merged_df[f"{col}_{name1}"].tolist(), merged_df[f"{col}_{name2}"].tolist()
-
-                from sklearn.linear_model import LinearRegression
-                from sklearn.metrics import r2_score
 
                 model = LinearRegression()
                 X, y = np.array(llama_col).reshape(-1, 1), np.array(gpt_col)

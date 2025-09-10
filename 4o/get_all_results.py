@@ -1,6 +1,8 @@
 import json
 import os
 import pdb
+import pickle
+import shutil
 from pathlib import Path
 
 import numpy as np
@@ -34,8 +36,6 @@ if __name__ == "__main__":
             if results_file[-4:] == ".csv":  # risk scores
                 risk_score_df = pd.read_csv(results_dir / results_file)
             if results_file == "imgs":
-                import shutil
-
                 shutil.copy(
                     results_dir / results_file / "calibration_curve.pdf",
                     f"calibration_plots_gpt/{f.split('_')[0]}.pdf",
@@ -75,7 +75,6 @@ if __name__ == "__main__":
     confidence_scores_df = confidence_scores_df.reset_index().rename(columns={"index": "dataset_name"})
 
     ### MASKING ###
-    import pickle
 
     for f in os.listdir(masking_dir):
         assert len(os.listdir(masking_dir / f)) == 1

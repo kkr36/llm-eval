@@ -1,6 +1,8 @@
 import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import r2_score
 
 
 plt.rc("axes", titlesize=20)
@@ -14,9 +16,6 @@ if __name__ == "__main__":
         merged_df = pd.merge(llm_csv, xgb_csv, on="dataset_name", how="inner")
         x_col = merged_df["xgb_auc"].tolist()
         y_col = merged_df["auc"].tolist()
-
-        from sklearn.linear_model import LinearRegression
-        from sklearn.metrics import r2_score
 
         model = LinearRegression()
         X, y = np.array(x_col).reshape(-1, 1), np.array(y_col)

@@ -6,6 +6,8 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import r2_score
 
 
 risk_scores_dir = Path("past_results/gpt_zero_shot")
@@ -43,9 +45,6 @@ if __name__ == "__main__":
         risk_scores = risk_score_df["risk_score"].tolist()
         labels = risk_score_df["label"].tolist()
         absolute_error = np.abs(risk_score_df["risk_score"] - risk_score_df["label"])
-
-        from sklearn.linear_model import LinearRegression
-        from sklearn.metrics import r2_score
 
         model = LinearRegression()
         X, y = np.array(risk_scores).reshape(-1, 1), np.array(absolute_error)
@@ -88,9 +87,6 @@ if __name__ == "__main__":
         plt.grid(True)
         plt.savefig(f"calibration_regression/box_plot_{name}.png")
         plt.clf()
-
-    from sklearn.linear_model import LinearRegression
-    from sklearn.metrics import r2_score
 
     model = LinearRegression()
     X, y = np.array([x[2] for x in datapoints]).reshape(-1, 1), np.array([x[1] for x in datapoints])

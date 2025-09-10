@@ -1,6 +1,8 @@
 import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import r2_score
 
 
 plt.rc("axes", titlesize=26)
@@ -50,9 +52,6 @@ if __name__ == "__main__":
             # if (col=="masking" and llm_path=="llama") or (col=="std_masking" and llm_path=="llama"): continue
             x_col = merged_df[col]
             y_col = merged_df["auc"].tolist()
-
-            from sklearn.linear_model import LinearRegression
-            from sklearn.metrics import r2_score
 
             model = LinearRegression()
             X, y = np.array(x_col).reshape(-1, 1), np.array(y_col)

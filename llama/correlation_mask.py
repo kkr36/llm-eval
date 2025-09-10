@@ -1,11 +1,14 @@
 import json
 import os
 import pdb
+import pickle
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import r2_score
 
 
 risk_scores_dir = Path("llama_zero_shot")
@@ -38,7 +41,6 @@ if __name__ == "__main__":
         risk_score_results[f.split("_")[0]] = [avg_risk, auc, std_risk, label_imbalance]
 
     # get all confidence score info
-    import pickle
 
     for f in os.listdir(confidence_scores_dir):
         assert len(os.listdir(confidence_scores_dir / f)) == 1
@@ -73,9 +75,6 @@ if __name__ == "__main__":
     plt.clf()
 
     assert len(confidence_results) == len(risk_score_results)
-
-    from sklearn.linear_model import LinearRegression
-    from sklearn.metrics import r2_score
 
     model = LinearRegression()
     X, y = (
