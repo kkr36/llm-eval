@@ -50,16 +50,12 @@ class TaskMetadata:
     """Whether to use numeric Q&A instead of multiple-choice Q&A prompts. Default is False."""
 
     # Class-level task storage
-    _tasks: ClassVar[dict[str, "TaskMetadata"]] = field(
-        default={}, init=False, repr=False
-    )
+    _tasks: ClassVar[dict[str, "TaskMetadata"]] = field(default={}, init=False, repr=False)
 
     def __post_init__(self):
         # Check if this task had already been created
         if self.name in TaskMetadata._tasks:
-            logging.error(
-                f"A task with `name='{self.name}'` already exists. Overwriting..."
-            )
+            logging.error(f"A task with `name='{self.name}'` already exists. Overwriting...")
 
         # Add this task to the class-level dictionary
         TaskMetadata._tasks[self.name] = self
@@ -77,11 +73,7 @@ class TaskMetadata:
             return
 
         # If no question is explicitly provided, use the question from the target column
-        if (
-            self.multiple_choice_qa is None
-            and self.direct_numeric_qa is None
-            and self.target is not None
-        ):
+        if self.multiple_choice_qa is None and self.direct_numeric_qa is None and self.target is not None:
             logging.warning(
                 f"No question was explicitly provided for task '{self.name}'. "
                 f"Inferring from target column's default question ({self.get_target()})."
@@ -131,8 +123,7 @@ class TaskMetadata:
 
         if raise_ and len(missing_cols) > 0:
             raise ValueError(
-                f"The following required task columns were not found in the dataset: "
-                f"{list(missing_cols)};"
+                f"The following required task columns were not found in the dataset: {list(missing_cols)};"
             )
 
         return len(missing_cols) == 0  # Return True if all columns are present
@@ -170,8 +161,7 @@ class TaskMetadata:
     def use_numeric_qa(self, use_numeric_qa: bool):
         """Setter for whether to use numeric Q&A instead of multiple-choice Q&A prompts."""
         logging.info(
-            f"Changing Q&A mode for task '{self.name}' to "
-            f"{'numeric' if use_numeric_qa else 'multiple-choice'}."
+            f"Changing Q&A mode for task '{self.name}' to {'numeric' if use_numeric_qa else 'multiple-choice'}."
         )
         self._use_numeric_qa = use_numeric_qa
 
@@ -222,27 +212,22 @@ class TaskMetadata:
             logging.critical(f"No Q&A interface provided for task {self.name}.")
         return q
 
-    def get_row_description(
-        self, row: pd.Series
-    ) -> str:  # TODO make this only use non-nan columns per row
+    def get_row_description(self, row: pd.Series) -> str:  # TODO make this only use non-nan columns per row
         """Encode a description of a given data row in textual form."""
         row = row[self.features]
         # row = row[row != "?"].dropna() # TODO confirm that dropping nan/uncollected variables is fine
 
-        res = "\n".join(
-            "- " + self.cols_to_text[col].get_text(val) for col, val in row.items()
-        )
+        res = "\n".join("- " + self.cols_to_text[col].get_text(val) for col, val in row.items())
 
         return res
 
-    def get_row_description_blank(
-        self, row: pd.Series
-    ) -> str:  # TODO make this only use non-nan columns per row
+    def get_row_description_blank(self, row: pd.Series) -> str:  # TODO make this only use non-nan columns per row
         row = row[self.features]
         # row = row[row != "?"].dropna() # TODO confirm that dropping nan/uncollected variables is fine
 
         res = "\n".join(
-            "- " + self.cols_to_text[col].short_description + " " + self.cols_to_text[col]._connector_verb + " <VALUE>" for col, val in row.items()
+            "- " + self.cols_to_text[col].short_description + " " + self.cols_to_text[col]._connector_verb + " <VALUE>"
+            for col, val in row.items()
         )
         return res
 

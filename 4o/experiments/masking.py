@@ -6,17 +6,17 @@ Problems:
 """
 
 import pickle
+import random
 
 import numpy as np
 import pandas as pd
-import random
-
 from folktexts.benchmark import Benchmark
 from folktexts.classifier import WebAPILLMClassifier
 from folktexts.col_to_text import ColumnToText
 from folktexts.dataset import Dataset
 from folktexts.qa_interface import Choice, DirectNumericQA, MultipleChoiceQA
 from folktexts.task import TaskMetadata
+
 
 def execute_experiment(
     model,
@@ -28,7 +28,7 @@ def execute_experiment(
     random_seed,
     task_prompt,
     config,
-    discretize_cols
+    discretize_cols,
 ):
     """_summary_
 
@@ -41,7 +41,7 @@ def execute_experiment(
     # iterate through randomly selected columns (or possible all columns? tbd)
     # for each column calculate auc; take an average
 
-    ban_cols = [outcomes[0]] # whole point is to not use outcome col
+    ban_cols = [outcomes[0]]  # whole point is to not use outcome col
     # if "subsampling" in config.additional_params:
     #     subsampling = (float(config.additional_params["subsampling"]) / 0.95) / len(
     #         data
@@ -51,7 +51,7 @@ def execute_experiment(
     if num_data > 1000:
         subsampling = (1000 / 0.95) / num_data
     else:
-        subsampling = 1.
+        subsampling = 1.0
 
     for col in data.columns:
         # apply null threshold
@@ -78,9 +78,7 @@ def execute_experiment(
         if col not in discretize_cols and data[col].value_counts(normalize=True).iloc[0] <= 0.1:
             ban_cols.append(col)
 
-    all_columns_map: dict[str, object] = {
-        col_mapper.value.name: col_mapper.value for col_mapper in column_encodings
-    }
+    all_columns_map: dict[str, object] = {col_mapper.value.name: col_mapper.value for col_mapper in column_encodings}
 
     all_tasks = {}
 
@@ -106,13 +104,11 @@ def execute_experiment(
         options_set = list(set(data[col.name].tolist()))
         final_col_name = f"{col.name}_binary"
 
-        if (
-            len(options_set) == 2
-        ):  # already binary; use the 2 options to make a yes/no question
+        if len(options_set) == 2:  # already binary; use the 2 options to make a yes/no question
             positive, negative = max(options_set), min(options_set)
-            filtered_data[final_col_name] = (
-                filtered_data[col.name] == positive
-            ).astype(int)  # positive -> 1; negative -> 0
+            filtered_data[final_col_name] = (filtered_data[col.name] == positive).astype(
+                int
+            )  # positive -> 1; negative -> 0
 
             newCol = ColumnToText(
                 final_col_name,
@@ -143,7 +139,9 @@ def execute_experiment(
                     filtered_data[col.name] = pd.to_datetime(filtered_data[col.name])
                     median = filtered_data[col.name].median()
             except:
-                import pdb; pdb.set_trace()
+                import pdb
+
+                pdb.set_trace()
             filtered_data[final_col_name] = (filtered_data[col.name] > median).astype(
                 int
             )  # if median above, say 1; otherwise 0
@@ -213,9 +211,7 @@ def execute_experiment(
             direct_numeric_qa=numeric_q,
         )
 
-        task.use_numeric_qa = (
-            False  # TODO confirm this means we don't use the direct numeric question
-        )
+        task.use_numeric_qa = False  # TODO confirm this means we don't use the direct numeric question
 
         dataset = Dataset(
             data=filtered_data,
@@ -241,16 +237,10 @@ def execute_experiment(
 
         RESULTS_DIR = artifacts_dir / taskname
         # (artifacts_dir/taskname)
-        all_results[taskname] = bench.run(
-            results_root_dir=RESULTS_DIR
-        )  # TODO figure out how to combine results
+        all_results[taskname] = bench.run(results_root_dir=RESULTS_DIR)  # TODO figure out how to combine results
 
     avg_auc = np.mean(
-        [
-            all_results[key]["roc_auc"]
-            for key in all_results
-            if all_results[key]["roc_auc"] is not np.nan
-        ]
+        [all_results[key]["roc_auc"] for key in all_results if all_results[key]["roc_auc"] is not np.nan]
     )
 
     with open(artifacts_dir / "all_results.pickle", "wb") as handle:

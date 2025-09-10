@@ -1,4 +1,5 @@
 """Common functions to use with transformer LLMs."""
+
 from __future__ import annotations
 
 import logging
@@ -9,15 +10,13 @@ import numpy as np
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
+
 # Will warn if the sum of digit probabilities is below this threshold
 PROB_WARN_THR = 0.5
 
 
 def query_model_batch(
-    text_inputs: list[str],
-    model: AutoModelForCausalLM,
-    tokenizer: AutoTokenizer,
-    context_size: int
+    text_inputs: list[str], model: AutoModelForCausalLM, tokenizer: AutoTokenizer, context_size: int
 ) -> np.array:
     """Queries the model with a batch of text inputs.
 
@@ -104,10 +103,7 @@ def query_model_batch_multiple_passes(
     # If `digits_only`, get token IDs for digit tokens
     allowed_tokens_filter = np.ones(len(tokenizer.vocab), dtype=bool)
     if digits_only:
-        allowed_token_ids = np.array([
-            tok_id
-            for token, tok_id in tokenizer.vocab.items() if token.isdecimal()
-        ])
+        allowed_token_ids = np.array([tok_id for token, tok_id in tokenizer.vocab.items() if token.isdecimal()])
 
         allowed_tokens_filter = np.zeros(len(tokenizer.vocab), dtype=bool)
         allowed_tokens_filter[allowed_token_ids] = True
@@ -157,7 +153,7 @@ def add_pad_token(tokenizer):
     embeddings.
     """
     if tokenizer.pad_token is None:
-        tokenizer.add_special_tokens({'pad_token': tokenizer.eos_token})
+        tokenizer.add_special_tokens({"pad_token": tokenizer.eos_token})
 
 
 def is_bf16_compatible() -> bool:
@@ -222,8 +218,7 @@ def get_model_folder_path(model_name: str, root_dir="/tmp") -> str:
 
 
 def get_model_size_B(model_name: str, default: int = None) -> int:
-    """Get the model size from the model name, in Billions of parameters.
-    """
+    """Get the model size from the model name, in Billions of parameters."""
     regex = re.search(r"((?P<times>\d+)[xX])?(?P<size>\d+)[bB]", model_name)
     if regex:
         return int(regex.group("size")) * int(regex.group("times") or 1)

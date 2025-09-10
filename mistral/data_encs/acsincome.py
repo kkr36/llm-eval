@@ -1,7 +1,10 @@
 from enum import Enum
+
 from folktexts.col_to_text import ColumnToText
-from folktexts.qa_interface import MultipleChoiceQA, Choice, DirectNumericQA
+from folktexts.qa_interface import Choice, DirectNumericQA, MultipleChoiceQA
+
 from data_encs.acsencodings import Encodings
+
 
 OUTCOMES = ["PINCP"]
 
@@ -114,10 +117,7 @@ class ColumnsEncoding(Enum):
     RELP_COL = ColumnToText(
         "RELP",
         short_description="relationship to head of household",
-        value_map={
-            k: v + " of head of household"
-            for k, v in (Encodings.RELP_DICT.value).items()
-        },
+        value_map={k: v + " of head of household" for k, v in (Encodings.RELP_DICT.value).items()},
     )
 
     WKHP_COL = ColumnToText(
@@ -153,5 +153,6 @@ class Reentry(Enum):
         column="PINCP",
         text=("Does this person earn more than $50000 annually?"),
     )
+
 
 discretize_cols = ["AGEP"]

@@ -1,19 +1,21 @@
+import importlib
 import json
 import os
-import importlib
-
 from argparse import ArgumentParser
 from pathlib import Path
+
 import pandas as pd
-
-
 from config import Config
 
 
 # TODO (Santiago) add typing
 def run_experiment(config: Config):
     experiment_name = config.experiment
-    exp_import_str = "no_data" if "auc" in experiment_name or "score" in experiment_name or "probs" in experiment_name else experiment_name
+    exp_import_str = (
+        "no_data"
+        if "auc" in experiment_name or "score" in experiment_name or "probs" in experiment_name
+        else experiment_name
+    )
     experiment = importlib.import_module(f"""experiments.{exp_import_str}""")
     model = config.model
     dataset = config.dataset
@@ -25,7 +27,7 @@ def run_experiment(config: Config):
     with open("../secrets.json", "r") as f:
         keys = json.load(f)
     os.environ["OPENAI_API_KEY"] = keys["open_ai_key"]
-    os.environ["HUGGINGFACE_TOKEN"] = keys['huggingface_token']
+    os.environ["HUGGINGFACE_TOKEN"] = keys["huggingface_token"]
 
     timestamp = pd.Timestamp.now().strftime("%m%d%H%M")
     artifacts_dir = Path("results") / f"{dataset}_{experiment_name}" / timestamp
@@ -41,9 +43,7 @@ def run_experiment(config: Config):
         task_prompts = importlib.import_module(f"task_prompts.{config.task_prompt}")
         question = task_prompts.THE_QUESTION
         context = task_prompts.CONTEXT
-        experiment = importlib.import_module(
-            f"experiments.no_data"
-        ).Experiment(
+        experiment = importlib.import_module(f"experiments.no_data").Experiment(
             model=model,
             # artifacts_dir=artifacts_dir,
             data=data,
@@ -60,7 +60,6 @@ def run_experiment(config: Config):
             experiment_name=experiment_name,
             context=context,
             outcome=outcomes,
-
             # serialization_fn=data_encodings.serialization_fn,
             # additional_info_fn=data_encodings.additional_info_fn,
             # prompt=task_prompt,
@@ -79,10 +78,9 @@ def run_experiment(config: Config):
             random_seed=int(config.random_seed),
             task_prompt=task_prompts.TASK_DESCRIPTION,
             config=config,
-            discretize_cols=data_encodings.discretize_cols
+            discretize_cols=data_encodings.discretize_cols,
         )
     elif config.use_folktexts:
-
         execute_experiment = getattr(experiment, "execute_experiment")
         execute_experiment(
             model=model,
@@ -96,13 +94,11 @@ def run_experiment(config: Config):
             config=config,
         )
     else:
-        assert("confidence" in experiment_name)
+        assert "confidence" in experiment_name
         task_prompts = importlib.import_module(f"task_prompts.{config.task_prompt}")
         task_prompt = task_prompts.TASK_DESCRIPTION
         task_context = task_prompts.CONTEXT
-        experiment = importlib.import_module(
-            f"experiments.{experiment_name}"
-        ).Experiment(
+        experiment = importlib.import_module(f"experiments.{experiment_name}").Experiment(
             model=model,
             # artifacts_dir=artifacts_dir,
             data=data,

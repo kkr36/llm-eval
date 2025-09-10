@@ -1,23 +1,24 @@
+import os
+
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import os
-from statsmodels.nonparametric.smoothers_lowess import lowess
-from scipy.interpolate import interp1d
-from sklearn.model_selection import KFold
-from xgboost import XGBRegressor
-from sklearn.linear_model import Lasso, LassoCV
-from sklearn.model_selection import GroupKFold
-import matplotlib.pyplot as plt
 import rpy2.robjects as ro
 from rpy2.robjects import pandas2ri
+from scipy.interpolate import interp1d
+from sklearn.linear_model import Lasso, LassoCV
+from sklearn.model_selection import GroupKFold, KFold
+from statsmodels.nonparametric.smoothers_lowess import lowess
+from xgboost import XGBRegressor
+
 
 # Activate conversion
 pandas2ri.activate()
 
 
-plt.rc("axes",titlesize=26)
-plt.rc("axes",labelsize=26)
-plt.rc("font",size=20)
+plt.rc("axes", titlesize=26)
+plt.rc("axes", labelsize=26)
+plt.rc("font", size=20)
 
 # data_mistral = pd.read_csv('mistral.csv')
 # data_gpt= pd.read_csv('gpt.csv')
@@ -34,6 +35,7 @@ plt.rc("font",size=20)
 
 # # compute the mean of data.auc for all points with std_risk_scores >= each threshold
 # mean_auc = [data.loc[data['std_risk_scores'] >= th, 'auc'].mean() for th in thresholds]
+
 
 # plot the computed means as a line
 # plt.plot(thresholds, mean_auc, color='red', label='Mean AUC for thresholds')
@@ -53,6 +55,7 @@ def bootstrap_loess_confidence_interval(x, y, frac, grid, n_boot=100, alpha=0.05
     lower_bound = np.percentile(boot_preds, 100 * alpha / 2, axis=0)
     upper_bound = np.percentile(boot_preds, 100 * (1 - alpha / 2), axis=0)
     return lower_bound, upper_bound
+
 
 # For GPT
 # x_grid = np.linspace(data_gpt[metric].min(), data_gpt[metric].max(), 100)
@@ -160,18 +163,18 @@ def bootstrap_loess_confidence_interval(x, y, frac, grid, n_boot=100, alpha=0.05
 # plt.show()
 
 
-
-gpt_features = pd.read_csv('gpt_deciles.csv')
-mistral_features = pd.read_csv('mistral_deciles.csv')
-gpt = pd.read_csv('gpt.csv')
-mistral = pd.read_csv('mistral.csv')
+gpt_features = pd.read_csv("gpt_deciles.csv")
+mistral_features = pd.read_csv("mistral_deciles.csv")
+gpt = pd.read_csv("gpt.csv")
+mistral = pd.read_csv("mistral.csv")
 for df in [gpt_features, mistral_features, gpt, mistral]:
-    df['dataset'] = df['dataset'].astype(str).apply(lambda x: x.split('_')[0])
+    df["dataset"] = df["dataset"].astype(str).apply(lambda x: x.split("_")[0])
 
-gpt_features.drop(columns=['dataset'], inplace=True)
-mistral_features.drop(columns=['dataset'], inplace=True)
+gpt_features.drop(columns=["dataset"], inplace=True)
+mistral_features.drop(columns=["dataset"], inplace=True)
 
 import scipy.stats
+
 
 # def compute_entropy(row):
 #     nonzero = row[row != 0]
@@ -208,12 +211,12 @@ import scipy.stats
 # for train_idx, val_idx in kf.split(X):
 #     X_train, X_val = X.iloc[train_idx], X.iloc[val_idx]
 #     y_train = y[train_idx]
-    
+
 #     # Fit an XGBoost model on 4 folds
 #     model = XGBRegressor(objective='reg:squarederror', n_estimators=100, random_state=42)
 #     # model = LassoCV(alphas=np.logspace(-4, 0, 50), cv=5, random_state=42)
 #     model.fit(X_train, y_train)
-    
+
 #     # Store predictions on the held-out fold
 #     oof_preds[val_idx] = model.predict(X_val)
 
@@ -263,13 +266,13 @@ import scipy.stats
 use_gpt = False
 
 if use_gpt:
-    groups = gpt['dataset']
+    groups = gpt["dataset"]
     features = gpt_features.copy()
-    target = gpt['auc'].values
+    target = gpt["auc"].values
 else:
-    groups = mistral['dataset']
+    groups = mistral["dataset"]
     features = mistral_features.copy()
-    target = mistral['auc'].values
+    target = mistral["auc"].values
 n_splits = min(5, groups.nunique())
 
 group_kf = GroupKFold(n_splits=n_splits)
@@ -282,11 +285,11 @@ for train_idx, test_idx in group_kf.split(features, target, groups):
     X_test = features.iloc[test_idx]
     y_train = target[train_idx]
     y_test = target[test_idx]
-    
+
     # Train model on training groups
-    model = XGBRegressor(objective='reg:squarederror', n_estimators=100, random_state=42)
+    model = XGBRegressor(objective="reg:squarederror", n_estimators=100, random_state=42)
     model.fit(X_train, y_train)
-    
+
     # Predict on test groups
     oof_preds[test_idx] = model.predict(X_test)
 
@@ -294,7 +297,7 @@ for train_idx, test_idx in group_kf.split(features, target, groups):
 largest_indices = np.argsort(oof_preds)[-10:][::-1]  # descending order
 
 # Indices of 5 smallest values
-smallest_indices = np.argsort(oof_preds)[:10] 
+smallest_indices = np.argsort(oof_preds)[:10]
 
 # import pdb; pdb.set_trace()
 
@@ -306,7 +309,7 @@ for ind in smallest_indices:
     sorted_data = np.sort(min_hist)
     print(np.std(sorted_data))
     # plt.hist(sorted_data, bins=40); plt.show(); plt.clf()
-    cdf = np.arange(1, len(sorted_data)+1) / len(sorted_data)
+    cdf = np.arange(1, len(sorted_data) + 1) / len(sorted_data)
     plt.plot(sorted_data, cdf, color="red", alpha=0.6)
 print("_________________________________")
 for ind in largest_indices:
@@ -314,15 +317,15 @@ for ind in largest_indices:
     sorted_data = np.sort(min_hist)
     print(np.std(sorted_data))
     # plt.hist(sorted_data, bins=40); plt.show(); plt.clf()
-    cdf = np.arange(1, len(sorted_data)+1) / len(sorted_data)
+    cdf = np.arange(1, len(sorted_data) + 1) / len(sorted_data)
     plt.plot(sorted_data, cdf, color="blue", alpha=0.6)
 
-plt.xlabel('Probability')
-plt.ylabel('CDF')
+plt.xlabel("Probability")
+plt.ylabel("CDF")
 # plt.grid(True)
 plt.tight_layout()
 # plt.savefig("../results_section_2/cdfs_mistral.pdf", format='pdf', bbox_inches='tight')
-plt.savefig("cdfs_mistral.pdf", format='pdf', bbox_inches='tight')
+plt.savefig("cdfs_mistral.pdf", format="pdf", bbox_inches="tight")
 plt.clf()
 
 
@@ -349,10 +352,10 @@ plt.clf()
 # plt.clf()
 
 # Create pandas DataFrame
-df = pd.DataFrame({'x': oof_preds, 'y': target})
+df = pd.DataFrame({"x": oof_preds, "y": target})
 
 # Push DataFrame to R
-ro.globalenv['df'] = pandas2ri.py2rpy(df)
+ro.globalenv["df"] = pandas2ri.py2rpy(df)
 
 # R script to generate and save the plot
 r_script = """
@@ -382,14 +385,14 @@ dev.off()
 # Run the R code
 ro.r(r_script)
 
-print("R^2:", np.corrcoef(oof_preds, target)[0, 1]**2)
+print("R^2:", np.corrcoef(oof_preds, target)[0, 1] ** 2)
 
 # Plot mean AUC over increasing prediction thresholds
 thresholds = np.sort(np.unique(oof_preds))
 mean_auc = [target[oof_preds >= th].mean() for th in thresholds if len(target[oof_preds >= th]) >= 5]
-plt.plot(thresholds[:len(mean_auc)], mean_auc, color='red', label='Mean AUC for thresholds')
-plt.xlabel('Avg OOS Pred ≥ Threshold')
-plt.ylabel('Mean AUC')
+plt.plot(thresholds[: len(mean_auc)], mean_auc, color="red", label="Mean AUC for thresholds")
+plt.xlabel("Avg OOS Pred ≥ Threshold")
+plt.ylabel("Mean AUC")
 # plt.legend()
 plt.ylim(0.5, 1)
 # plt.savefig(f"../results_section_2/threshold_mistral.pdf", format="pdf", bbox_inches="tight")
@@ -400,23 +403,19 @@ plt.clf()
 group_kf = GroupKFold(n_splits=n_splits)
 
 
-
-
-
-
 # Initialize out-of-sample predictions array for gpt
 oof_preds_gpt = np.zeros(len(gpt))
 
-for train_idx, test_idx in group_kf.split(gpt_features, gpt['auc'], groups):
+for train_idx, test_idx in group_kf.split(gpt_features, gpt["auc"], groups):
     X_train = gpt_features.iloc[train_idx]
     X_test = gpt_features.iloc[test_idx]
-    y_train = gpt['auc'].values[train_idx]
-    y_test = gpt['auc'].values[test_idx]
-    
+    y_train = gpt["auc"].values[train_idx]
+    y_test = gpt["auc"].values[test_idx]
+
     # Train model on training groups
-    model = XGBRegressor(objective='reg:squarederror', n_estimators=100, random_state=42)
+    model = XGBRegressor(objective="reg:squarederror", n_estimators=100, random_state=42)
     model.fit(X_train, y_train)
-    
+
     # Predict on test groups
     oof_preds_gpt[test_idx] = model.predict(X_test)
 
@@ -426,7 +425,7 @@ for train_idx, test_idx in group_kf.split(gpt_features, gpt['auc'], groups):
 largest_indices = np.argsort(oof_preds_gpt)[-10:][::-1]  # descending order
 
 # Indices of 5 smallest values
-smallest_indices = np.argsort(oof_preds_gpt)[:10] 
+smallest_indices = np.argsort(oof_preds_gpt)[:10]
 
 decile_cols = [col for col in gpt_features.columns if col.startswith("decile_")]
 deciles = gpt_features[decile_cols]
@@ -434,21 +433,21 @@ deciles = gpt_features[decile_cols]
 for ind in smallest_indices:
     min_hist = deciles.iloc[ind].to_numpy()
     sorted_data = np.sort(min_hist)
-    cdf = np.arange(1, len(sorted_data)+1) / len(sorted_data)
+    cdf = np.arange(1, len(sorted_data) + 1) / len(sorted_data)
     plt.plot(sorted_data, cdf, color="red", alpha=0.6)
 
 for ind in largest_indices:
     min_hist = deciles.iloc[ind].to_numpy()
     sorted_data = np.sort(min_hist)
-    cdf = np.arange(1, len(sorted_data)+1) / len(sorted_data)
+    cdf = np.arange(1, len(sorted_data) + 1) / len(sorted_data)
     plt.plot(sorted_data, cdf, color="blue", alpha=0.6)
 
-plt.xlabel('Probability')
-plt.ylabel('CDF')
+plt.xlabel("Probability")
+plt.ylabel("CDF")
 # plt.grid(True)
 plt.tight_layout()
 # plt.savefig("../results_section_2/cdfs_gpt.pdf", format='pdf', bbox_inches='tight')
-plt.savefig("cdfs_gpt.pdf", format='pdf', bbox_inches='tight')
+plt.savefig("cdfs_gpt.pdf", format="pdf", bbox_inches="tight")
 
 plt.clf()
 
@@ -476,10 +475,10 @@ plt.clf()
 # plt.clf()
 
 # Create pandas DataFrame
-df = pd.DataFrame({'x': oof_preds_gpt, 'y': gpt['auc'].tolist()})
+df = pd.DataFrame({"x": oof_preds_gpt, "y": gpt["auc"].tolist()})
 
 # Push DataFrame to R
-ro.globalenv['df'] = pandas2ri.py2rpy(df)
+ro.globalenv["df"] = pandas2ri.py2rpy(df)
 
 # R script to generate and save the plot
 r_script = """
@@ -509,14 +508,14 @@ dev.off()
 # Run the R code
 ro.r(r_script)
 
-print("R^2:", np.corrcoef(oof_preds_gpt, gpt['auc'])[0, 1]**2)
+print("R^2:", np.corrcoef(oof_preds_gpt, gpt["auc"])[0, 1] ** 2)
 
 # Plot mean AUC over increasing prediction thresholds
 thresholds = np.sort(np.unique(oof_preds_gpt))
-mean_auc = [gpt['auc'][oof_preds_gpt >= th].mean() for th in thresholds if len(gpt['auc'][oof_preds_gpt >= th]) >= 5]
-plt.plot(thresholds[:len(mean_auc)], mean_auc, color='red', label='Mean AUC for thresholds')
-plt.xlabel('Avg OOS Pred ≥ Threshold')
-plt.ylabel('Mean AUC')
+mean_auc = [gpt["auc"][oof_preds_gpt >= th].mean() for th in thresholds if len(gpt["auc"][oof_preds_gpt >= th]) >= 5]
+plt.plot(thresholds[: len(mean_auc)], mean_auc, color="red", label="Mean AUC for thresholds")
+plt.xlabel("Avg OOS Pred ≥ Threshold")
+plt.ylabel("Mean AUC")
 # plt.legend()
 plt.ylim(0.5, 1)
 # plt.savefig(f"../results_section_2/threshold_gpt.pdf", format="pdf", bbox_inches="tight")
@@ -527,20 +526,20 @@ plt.clf()
 
 import statsmodels.api as sm
 
-for frame, name in [(gpt, "gpt"), (mistral, "mistral")]:
 
-    frame['normalized_auc'] = frame['auc'] / frame['xgb_auc']
+for frame, name in [(gpt, "gpt"), (mistral, "mistral")]:
+    frame["normalized_auc"] = frame["auc"] / frame["xgb_auc"]
     # Create indicator variables for the 'dataset' column without dropping any categories
-    dataset_indicators = pd.get_dummies(frame['dataset'], drop_first=False)
+    dataset_indicators = pd.get_dummies(frame["dataset"], drop_first=False)
     # Fit linear regression of auc on the indicators without an intercept
-    model = sm.OLS(frame['auc'], dataset_indicators).fit()
+    model = sm.OLS(frame["auc"], dataset_indicators).fit()
     print(f"R^2 for regression without intercept {name}:", model.rsquared)
 
     # Calculate overall variance of the 'auc' column (sample variance)
-    overall_var = frame['auc'].var()
+    overall_var = frame["auc"].var()
 
     # Calculate variance within each dataset group and then the average variance
-    avg_within_var = frame.groupby('dataset')['auc'].var().mean()
+    avg_within_var = frame.groupby("dataset")["auc"].var().mean()
 
     # Compute the ratio of average within-dataset variance to overall variance
     ratio = avg_within_var / overall_var

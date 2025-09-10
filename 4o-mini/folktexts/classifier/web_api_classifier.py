@@ -1,5 +1,4 @@
-"""Module for using a language model through a web API for risk classification.
-"""
+"""Module for using a language model through a web API for risk classification."""
 
 from __future__ import annotations
 
@@ -29,7 +28,7 @@ class WebAPILLMClassifier(LLMClassifier):
         encode_row: Callable[[pd.Series], str] = None,
         threshold: float = 0.5,
         correct_order_bias: bool = True,
-        max_api_rpm: int = 5000,    # NOTE: OpenAI Tier 1 limit is only 500 RPM !
+        max_api_rpm: int = 5000,  # NOTE: OpenAI Tier 1 limit is only 500 RPM !
         seed: int = 42,
         **inference_kwargs,
     ):
@@ -94,14 +93,17 @@ class WebAPILLMClassifier(LLMClassifier):
 
         # Set-up litellm API client
         import litellm
+
         litellm.success_callback = [self.track_cost_callback]
 
-        from litellm import completion, batch_completion
+        from litellm import batch_completion, completion
+
         self.text_completion_api = completion
         self.batch_completion = batch_completion
 
         # Get supported parameters
         from litellm import get_supported_openai_params
+
         supported_params = get_supported_openai_params(model=self.model_name)
         if supported_params is None:
             raise RuntimeError(f"Failed to get supported parameters for model '{self.model_name}'.")
@@ -199,17 +201,19 @@ class WebAPILLMClassifier(LLMClassifier):
             raise ValueError(f"Unknown question type '{type(question)}'.")
 
         # Query model for each prompt in the batch
-        messages = [[
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": prompt},
-        ] for prompt in prompts_batch]
+        messages = [
+            [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": prompt},
+            ]
+            for prompt in prompts_batch
+        ]
         # import pdb; pdb.set_trace()
         responses_batch = self.batch_completion(
             model=self.model_name,
             messages=messages,
             **api_call_params,
         )
-
 
         # for prompt in prompts_batch:
 
@@ -275,13 +279,12 @@ class WebAPILLMClassifier(LLMClassifier):
         id_to_token = {i: tok for i, tok in enumerate(vocab_tokens)}
 
         # 2. Parse `token_probs_all_passes` into an array of shape (num_passes, vocab_size)
-        token_probs_array = np.array([
+        token_probs_array = np.array(
             [
-                forward_pass.get(id_to_token[i], 0)
-                for i in range(len(vocab_tokens))
+                [forward_pass.get(id_to_token[i], 0) for i in range(len(vocab_tokens))]
+                for forward_pass in token_probs_all_passes
             ]
-            for forward_pass in token_probs_all_passes
-        ])
+        )
         # NOTE: token_probs.shape = (num_passes, vocab_size)
 
         # Get risk estimate
@@ -315,7 +318,8 @@ class WebAPILLMClassifier(LLMClassifier):
             except Exception:
                 logging.error(
                     f"Failed to extract numeric response from message='{response_message}';\n"
-                    f"Falling back on standard risk estimate of {risk_estimate}.")
+                    f"Falling back on standard risk estimate of {risk_estimate}."
+                )
 
         return risk_estimate
 
@@ -357,8 +361,7 @@ class WebAPILLMClassifier(LLMClassifier):
 
         # Parse API responses and decode model output
         risk_estimates_batch = [
-            self._decode_risk_estimate_from_api_response(response, question)
-            for response in api_responses_batch
+            self._decode_risk_estimate_from_api_response(response, question) for response in api_responses_batch
         ]
 
         return risk_estimates_batch

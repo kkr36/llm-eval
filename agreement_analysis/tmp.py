@@ -1,5 +1,7 @@
-import pandas as pd
 import sys
+
+import pandas as pd
+
 
 def sort_csv_by_index(file_path):
     # Read CSV with index
@@ -11,5 +13,6 @@ def sort_csv_by_index(file_path):
     # Overwrite original file
     df_sorted.to_csv(file_path)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     sort_csv_by_index("dataset_descriptions.csv")

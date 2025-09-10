@@ -1,21 +1,23 @@
+import os
+
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import os
-from statsmodels.nonparametric.smoothers_lowess import lowess
-from scipy.interpolate import interp1d
-import matplotlib.pyplot as plt
 import rpy2.robjects as ro
 from rpy2.robjects import pandas2ri
+from scipy.interpolate import interp1d
+from statsmodels.nonparametric.smoothers_lowess import lowess
+
 
 # Activate conversion
 pandas2ri.activate()
 
-llama_new = pd.read_csv('llama.csv')
-gpt_new= pd.read_csv('gpt.csv')
+llama_new = pd.read_csv("llama.csv")
+gpt_new = pd.read_csv("gpt.csv")
 
-plt.rc("axes",titlesize=26)
-plt.rc("axes",labelsize=26)
-plt.rc("font",size=20)
+plt.rc("axes", titlesize=26)
+plt.rc("axes", labelsize=26)
+plt.rc("font", size=20)
 
 
 # llama_new = pd.read_csv('llama_new.csv')
@@ -30,6 +32,7 @@ plt.rc("font",size=20)
 
 # # compute the mean of data.auc for all points with std_risk_scores >= each threshold
 # mean_auc = [data.loc[data['std_risk_scores'] >= th, 'auc'].mean() for th in thresholds]
+
 
 # # plot the computed means as a line
 # plt.plot(thresholds, mean_auc, color='red', label='Mean AUC for thresholds')
@@ -49,6 +52,7 @@ def bootstrap_loess_confidence_interval(x, y, frac, grid, n_boot=100, alpha=0.05
     lower_bound = np.percentile(boot_preds, 100 * alpha / 2, axis=0)
     upper_bound = np.percentile(boot_preds, 100 * (1 - alpha / 2), axis=0)
     return lower_bound, upper_bound
+
 
 # # For GPT
 # x_grid = np.linspace(data_gpt[metric].min(), data_gpt[metric].max(), 100)
@@ -115,18 +119,18 @@ def bootstrap_loess_confidence_interval(x, y, frac, grid, n_boot=100, alpha=0.05
 #     plt.title(metric)
 #     plt.show()
 
-metric= 'std_risk'
+metric = "std_risk"
 x1 = gpt_new[metric].values
-y1 = gpt_new['auc'].values
+y1 = gpt_new["auc"].values
 x2 = llama_new[metric].values
-y2 = llama_new['auc'].values
+y2 = llama_new["auc"].values
 
-for (x,y,llm) in [(x1,y1,"GPT"), (x2,y2,"Llama")]:
+for x, y, llm in [(x1, y1, "GPT"), (x2, y2, "Llama")]:
     # Create pandas DataFrame
-    df = pd.DataFrame({'x': x, 'y': y})
+    df = pd.DataFrame({"x": x, "y": y})
 
     # Push DataFrame to R
-    ro.globalenv['df'] = pandas2ri.py2rpy(df)
+    ro.globalenv["df"] = pandas2ri.py2rpy(df)
 
     # R script to generate and save the plot
     r_script = f"""
@@ -181,7 +185,6 @@ for (x,y,llm) in [(x1,y1,"GPT"), (x2,y2,"Llama")]:
     # plt.savefig(f"../results_section_2/{llm}_std_risk_score.pdf", format="pdf", bbox_inches="tight")
     # plt.clf()
 
-
     thresholds = np.sort(np.unique(x))
 
     # compute the mean of data.auc for all points with std_risk_scores >= each threshold
@@ -189,9 +192,9 @@ for (x,y,llm) in [(x1,y1,"GPT"), (x2,y2,"Llama")]:
     # import pdb; pdb.set_trace()
 
     # plot the computed means as a line
-    plt.plot(thresholds, mean_auc, color='red', label='Mean AUC for thresholds')
-    plt.xlabel('Std. Risk Scores ≥ Threshold')
-    plt.ylabel('Mean AUC')
+    plt.plot(thresholds, mean_auc, color="red", label="Mean AUC for thresholds")
+    plt.xlabel("Std. Risk Scores ≥ Threshold")
+    plt.ylabel("Mean AUC")
     # plt.legend()
     plt.ylim(0.5, 1)
     plt.savefig(f"../results_section_2/{llm}_std_risk_score_sliding_window.pdf", format="pdf", bbox_inches="tight")

@@ -1,5 +1,5 @@
-"""A benchmark class for measuring and evaluating LLM calibration.
-"""
+"""A benchmark class for measuring and evaluating LLM calibration."""
+
 from __future__ import annotations
 
 import dataclasses
@@ -12,7 +12,7 @@ import numpy as np
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
 from ._io import load_json, save_json
-from ._utils import hash_dict, is_valid_number, get_current_timestamp
+from ._utils import get_current_timestamp, hash_dict, is_valid_number
 from .acs.acs_dataset import ACSDataset
 from .acs.acs_tasks import ACSTaskMetadata
 from .classifier import LLMClassifier, TransformersLLMClassifier, WebAPILLMClassifier
@@ -21,6 +21,7 @@ from .evaluation import evaluate_predictions
 from .plotting import render_evaluation_plots, render_fairness_plots
 from .prompting import encode_row_prompt, encode_row_prompt_few_shot
 from .task import TaskMetadata
+
 
 DEFAULT_SEED = 42
 DEFAULT_FIT_THRESHOLD_N = 100
@@ -111,10 +112,7 @@ class BenchmarkConfig:
         """Generates a unique hash for the configuration."""
         cfg = dataclasses.asdict(self)
         cfg["feature_subset"] = tuple(cfg["feature_subset"]) if cfg["feature_subset"] else None
-        cfg["population_filter_hash"] = (
-            hash_dict(cfg["population_filter"])
-            if cfg["population_filter"] else None
-        )
+        cfg["population_filter_hash"] = hash_dict(cfg["population_filter"]) if cfg["population_filter"] else None
         return int(hash_dict(cfg), 16)
 
 
@@ -129,12 +127,10 @@ class Benchmark:
         "survey_year": "2018",
         "horizon": "1-Year",
         "survey": "person",
-
         # Data split configs
         "test_size": 0.1,
         "val_size": 0.1,
         "subsampling": None,
-
         # Fixed random seed
         "seed": 42,
     }
@@ -363,16 +359,18 @@ class Benchmark:
         if self.task.sensitive_attribute is not None:
             s_test = self.dataset.get_sensitive_attribute_data().loc[y_test.index]
 
-            plots_paths.update(render_fairness_plots(
-                y_true=y_test.to_numpy(),
-                y_pred_scores=self._y_test_scores,
-                sensitive_attribute=s_test,
-                eval_results=self.results,
-                model_name=self.llm_clf.model_name,
-                group_value_map=self.task.sensitive_attribute_value_map(),
-                imgs_dir=imgs_dir,
-                show_plots=show_plots,
-            ))
+            plots_paths.update(
+                render_fairness_plots(
+                    y_true=y_test.to_numpy(),
+                    y_pred_scores=self._y_test_scores,
+                    sensitive_attribute=s_test,
+                    eval_results=self.results,
+                    model_name=self.llm_clf.model_name,
+                    group_value_map=self.task.sensitive_attribute_value_map(),
+                    imgs_dir=imgs_dir,
+                    show_plots=show_plots,
+                )
+            )
 
         self._results["plots"] = plots_paths
 
@@ -449,21 +447,17 @@ class Benchmark:
                 logging.warning(
                     f"Received non-standard ACS argument '{arg}' (using "
                     f"{arg}={kwargs[arg]} instead of default {arg}={cls.ACS_DATASET_CONFIGS[arg]}). "
-                    f"This may affect reproducibility.")
+                    f"This may affect reproducibility."
+                )
                 acs_dataset_configs[arg] = kwargs.pop(arg)
 
         # Update config with any additional kwargs
         config = config.update(**kwargs)
 
         # Fetch ACS task and dataset
-        acs_task = ACSTaskMetadata.get_task(
-            name=task_name,
-            use_numeric_qa=config.numeric_risk_prompting)
+        acs_task = ACSTaskMetadata.get_task(name=task_name, use_numeric_qa=config.numeric_risk_prompting)
 
-        acs_dataset = ACSDataset.make_from_task(
-            task=acs_task,
-            cache_dir=data_dir,
-            **acs_dataset_configs)
+        acs_dataset = ACSDataset.make_from_task(task=acs_task, cache_dir=data_dir, **acs_dataset_configs)
 
         return cls.make_benchmark(
             task=acs_task,
@@ -481,7 +475,7 @@ class Benchmark:
         task: TaskMetadata | str,
         dataset: Dataset,
         model: AutoModelForCausalLM | str,
-        tokenizer: AutoTokenizer = None,    # WebAPI models have no local tokenizer
+        tokenizer: AutoTokenizer = None,  # WebAPI models have no local tokenizer
         max_api_rpm: int = None,
         config: BenchmarkConfig = BenchmarkConfig.default_config(),
         **kwargs,
@@ -528,9 +522,7 @@ class Benchmark:
 
         # Check dataset is compatible with task
         if dataset.task is not task and dataset.task.name != task.name:
-            raise ValueError(
-                f"Dataset task '{dataset.task.name}' does not match the "
-                f"provided task '{task.name}'.")
+            raise ValueError(f"Dataset task '{dataset.task.name}' does not match the provided task '{task.name}'.")
 
         if config.population_filter is not None:
             dataset = dataset.filter(config.population_filter)

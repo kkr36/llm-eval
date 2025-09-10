@@ -1,5 +1,5 @@
-from folktexts.classifier import WebAPILLMClassifier
 from folktexts.benchmark import Benchmark
+from folktexts.classifier import WebAPILLMClassifier
 from folktexts.dataset import Dataset
 from folktexts.task import TaskMetadata
 
@@ -31,11 +31,9 @@ def execute_experiment(
     if num_data > 1000:
         subsampling = (1000 / 0.95) / num_data
     else:
-        subsampling = 1.
+        subsampling = 1.0
 
-    columns_map: dict[str, object] = {
-        col_mapper.value.name: col_mapper.value for col_mapper in column_encodings
-    }
+    columns_map: dict[str, object] = {col_mapper.value.name: col_mapper.value for col_mapper in column_encodings}
 
     reentry_qa = reentries.reentry_qa.value
     reentry_numeric_qa = reentries.reentry_numeric_qa.value
@@ -51,7 +49,6 @@ def execute_experiment(
         multiple_choice_qa=reentry_qa,
         direct_numeric_qa=reentry_numeric_qa,
     )
-
 
     # TODO We need to handle the subsampling way better
     reentry_dataset = Dataset(

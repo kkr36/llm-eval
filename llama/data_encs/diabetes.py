@@ -6,15 +6,17 @@ Problems:
 """
 
 import pdb
-from tqdm import tqdm
 from enum import Enum
-from folktexts.col_to_text import ColumnToText
-from folktexts.qa_interface import MultipleChoiceQA, Choice, DirectNumericQA
+
 import pandas as pd
+from folktexts.col_to_text import ColumnToText
+from folktexts.qa_interface import Choice, DirectNumericQA, MultipleChoiceQA
+from tqdm import tqdm
+
 
 data = pd.read_csv("../data/diabetes.csv")
 
-OUTCOMES = ['readmitted']
+OUTCOMES = ["readmitted"]
 
 DISCHARGE_DISPOSITION_MAP = {
     1: "Discharged to home",
@@ -560,21 +562,18 @@ class ColumnsEncoding(Enum):
     OUTCOME = ColumnToText(
         "readmitted",
         short_description="whether patient was readmitted with 30 days",
-        value_map=lambda x: 1 if x == "<30" else 0
+        value_map=lambda x: 1 if x == "<30" else 0,
     )
 
 
 class Reentry(Enum):
     reentry_numeric_qa = DirectNumericQA(
-        column='readmitted',
-        text=(
-            "Was the patient readmitted within 30 days?"
-        ),
+        column="readmitted",
+        text=("Was the patient readmitted within 30 days?"),
     )
 
-
     reentry_qa = MultipleChoiceQA(
-        column='readmitted',
+        column="readmitted",
         text="Was the patient readmitted within 30 days?",
         choices=(
             Choice("Yes, they were", 1),
@@ -582,9 +581,10 @@ class Reentry(Enum):
         ),
     )
 
+
 discretize_cols = [
-        "time_in_hospital",
-        "number_diagnoses",
-        "num_lab_procedures",
-        "num_medications",
-    ]
+    "time_in_hospital",
+    "number_diagnoses",
+    "num_lab_procedures",
+    "num_medications",
+]

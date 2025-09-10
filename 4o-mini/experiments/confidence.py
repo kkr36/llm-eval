@@ -1,15 +1,15 @@
 import os
+import pdb
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
+from folktexts.task import TaskMetadata
 from openai import OpenAI
 from tqdm import tqdm
-from folktexts.task import TaskMetadata
-from pathlib import Path
-import pdb
+
 
 def process_batch(file_response):
-
     num_weights = len(file_response)
     weights = []
 
@@ -21,6 +21,7 @@ def process_batch(file_response):
             pdb.set_trace()
     assert len(weights) == num_weights
     return weights
+
 
 class Experiment:
     def __init__(
@@ -60,9 +61,7 @@ class Experiment:
         # turn the df to text and save
 
         np.random.seed(self.random_seed)
-        train_indices = np.random.choice(
-            len(self.train_csv), size=min(1000, len(self.train_csv)), replace=False
-        )
+        train_indices = np.random.choice(len(self.train_csv), size=min(1000, len(self.train_csv)), replace=False)
 
         train = self.train_csv.iloc[train_indices].reset_index(drop=True)
 
@@ -96,26 +95,22 @@ class Experiment:
         results = []
 
         for s in tqdm(strs):
-
             full_prompt = f"{s} {prompt}"
             messages = [
                 {"role": "system", "content": context},
                 {"role": "user", "content": full_prompt},
             ]
 
-            import pdb; pdb.set_trace()
+            import pdb
 
-            response = client.chat.completions.create(
-                model=self.model.split("/")[-1], messages=messages
-            )
+            pdb.set_trace()
+
+            response = client.chat.completions.create(model=self.model.split("/")[-1], messages=messages)
             results.append(response.choices[0].message.content)
-
 
         uncertainty_scores = process_batch(results)
         df = pd.DataFrame({"uncertainty_score": uncertainty_scores})
         output_str = artifacts_dir / f"{self.experiment_name}"
         output_path = Path(output_str)
         output_path.mkdir(parents=True, exist_ok=True)
-        df.to_csv(
-            output_str / "uncertainty_scores.csv", index=False
-        )
+        df.to_csv(output_str / "uncertainty_scores.csv", index=False)

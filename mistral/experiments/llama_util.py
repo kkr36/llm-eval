@@ -1,15 +1,18 @@
-from transformers import AutoTokenizer, AutoModelForCausalLM
+import os
+
 import torch
 import transformers
-
 from huggingface_hub import login
-import os
+from transformers import AutoModelForCausalLM, AutoTokenizer
+
+
 login(os.getenv("HUGGINGFACE_TOKEN"))
 
 torch.set_grad_enabled(False)
 
 # model_path = "meta-llama/Meta-Llama-3.1-8B-Instruct"
 # input_string = "generate a value of a good AUC score on an arbitrary binary classification task. output nothing except the probability. you should generate no leading zero; the first character after 'answer: ' should be a decimal place '.'. answer: ."
+
 
 def generate_probs(model_path, input_string):
     # messages = [
@@ -53,7 +56,7 @@ def generate_probs(model_path, input_string):
 
     # convert ids to tokens
     texts = tokenizer.convert_ids_to_tokens(ids)
-    cleaned_tokens = [t.replace('Ċ', '').replace('Ġ', '') for t in texts]
+    cleaned_tokens = [t.replace("Ċ", "").replace("Ġ", "") for t in texts]
 
     # print
     return list(zip(cleaned_tokens, probs))

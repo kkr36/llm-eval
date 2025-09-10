@@ -1,5 +1,5 @@
-"""Module to hold ACS column mappings from values to natural text.
-"""
+"""Module to hold ACS column mappings from values to natural text."""
+
 from functools import partial
 from pathlib import Path
 
@@ -15,6 +15,7 @@ from .acs_thresholds import (
     acs_public_coverage_threshold,
     acs_travel_time_threshold,
 )
+
 
 # Path to ACS codebook files
 ACS_CODEBOOK_DIR = Path(__file__).parent / "data"
@@ -165,7 +166,8 @@ acs_race = ColumnToText(
         4: "Alaska Native",
         5: (
             "American Indian and Alaska Native tribes specified; or American "
-            "Indian or Alaska Native, not specified and no other races"),
+            "Indian or Alaska Native, not specified and no other races"
+        ),
         6: "Asian",
         7: "Native Hawaiian and Other Pacific Islander",
         8: "Some other race alone (non-White)",
@@ -194,10 +196,7 @@ acs_income_qa = MultipleChoiceQA(
 
 acs_income_numeric_qa = DirectNumericQA(
     column=acs_income_threshold.apply_to_column_name("PINCP"),
-    text=(
-        "What is the probability that this person's estimated yearly income is "
-        "above $50,000 ?"
-    ),
+    text=("What is the probability that this person's estimated yearly income is above $50,000 ?"),
 )
 
 acs_income_target_col = ColumnToText(
@@ -304,7 +303,7 @@ acs_mobility = ColumnToText(
 
 # MIG: Mobility Status (Thresholded)
 acs_mobility_qa = MultipleChoiceQA(
-    column=acs_mobility_threshold.apply_to_column_name("MIG"),      # NOTE: Thresholded by MIG!=1
+    column=acs_mobility_threshold.apply_to_column_name("MIG"),  # NOTE: Thresholded by MIG!=1
     text="Has this person moved in the last year?",
     choices=(
         Choice("No, person has lived in the same house for the last year", 0),
@@ -313,7 +312,7 @@ acs_mobility_qa = MultipleChoiceQA(
 )
 
 acs_mobility_numeric_qa = DirectNumericQA(
-    column=acs_mobility_threshold.apply_to_column_name("MIG"),      # NOTE: Thresholded by MIG!=1
+    column=acs_mobility_threshold.apply_to_column_name("MIG"),  # NOTE: Thresholded by MIG!=1
     text=(
         "What is the probability that this person has moved in the last year?"
     ),  # NOTE: Question should relate to probability of MIG!=1
@@ -508,7 +507,7 @@ acs_state = ColumnToText(
     value_map=partial(
         parse_pums_code,
         file=ACS_CODEBOOK_DIR / "ST.txt",
-        postprocess=lambda x: x[:x.find("/")].strip(),
+        postprocess=lambda x: x[: x.find("/")].strip(),
     ),
 )
 
@@ -671,7 +670,7 @@ acs_health_ins_2_col = ColumnToText(
         2: (
             "Person has not purchased insurance directly from an insurance "
             "company (is either uninsured or insured through another source)",
-        )
+        ),
     },
 )
 
@@ -688,8 +687,7 @@ acs_health_ins_2_qa = MultipleChoiceQA(
 acs_health_ins_2_numeric_qa = DirectNumericQA(
     column=acs_health_insurance_threshold.apply_to_column_name("HINS2"),
     text=(
-        "What is the probability that this person has purchased health "
-        "insurance directly through a private company?"
+        "What is the probability that this person has purchased health insurance directly through a private company?"
     ),  # NOTE: Question should relate to probability of HINS2==1
 )
 

@@ -1,8 +1,10 @@
-from folktexts.classifier import WebAPILLMClassifier
-from folktexts.classifier import TransformersLLMClassifier
-from transformers import AutoTokenizer, AutoModelForCausalLM
-from huggingface_hub import login
 import os
+
+from folktexts.classifier import TransformersLLMClassifier, WebAPILLMClassifier
+from huggingface_hub import login
+from transformers import AutoModelForCausalLM, AutoTokenizer
+
+
 login(os.getenv("HUGGINGFACE_TOKEN"))
 import torch
 from folktexts.benchmark import Benchmark
@@ -37,12 +39,10 @@ def execute_experiment(
     if num_data > 1000:
         subsampling = (1000 / 0.95) / num_data
     else:
-        subsampling = 1.
+        subsampling = 1.0
     # subsampling = (24) / num_data
 
-    columns_map: dict[str, object] = {
-        col_mapper.value.name: col_mapper.value for col_mapper in column_encodings
-    }
+    columns_map: dict[str, object] = {col_mapper.value.name: col_mapper.value for col_mapper in column_encodings}
 
     reentry_qa = reentries.reentry_qa.value
     reentry_numeric_qa = reentries.reentry_numeric_qa.value
@@ -58,7 +58,6 @@ def execute_experiment(
         multiple_choice_qa=reentry_qa,
         direct_numeric_qa=reentry_numeric_qa,
     )
-
 
     # TODO We need to handle the subsampling way better
     reentry_dataset = Dataset(
@@ -78,12 +77,14 @@ def execute_experiment(
         if "openai" in model:
             llm_clf = WebAPILLMClassifier(model_name=model, task=task, custom_prompt_prefix=task_prompt)
         else:
-            assert("mistral" in model)
+            assert "mistral" in model
             tokenizer = AutoTokenizer.from_pretrained(model, use_safetensors=True)
-            llm = AutoModelForCausalLM.from_pretrained(model, use_safetensors=True).to('cuda')
+            llm = AutoModelForCausalLM.from_pretrained(model, use_safetensors=True).to("cuda")
             # import pdb; pdb.set_trace()
             tokenizer.pad_token_id = llm.config.eos_token_id
-            llm_clf = TransformersLLMClassifier(model=llm, tokenizer=tokenizer, task=task, custom_prompt_prefix=task_prompt)
+            llm_clf = TransformersLLMClassifier(
+                model=llm, tokenizer=tokenizer, task=task, custom_prompt_prefix=task_prompt
+            )
         llm_clf.set_inference_kwargs(batch_size=500 if "openai" in model else 8)
         bench = Benchmark(llm_clf=llm_clf, dataset=dataset)
         # think how to abstract away the dir path to avoid bugs

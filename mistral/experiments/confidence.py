@@ -1,20 +1,21 @@
 import os
+import pdb
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
+import torch
+import transformers
+from folktexts.task import TaskMetadata
+from huggingface_hub import login
 from openai import OpenAI
 from tqdm import tqdm
-from folktexts.task import TaskMetadata
-from pathlib import Path
-import transformers
-import torch
-import pdb
 
-from huggingface_hub import login
+
 login(os.getenv("HUGGINGFACE_TOKEN"))
 
-def process_batch(file_response):
 
+def process_batch(file_response):
     num_weights = len(file_response)
     weights = []
 
@@ -22,7 +23,8 @@ def process_batch(file_response):
         try:
             res = response.split("Probability: ")[-1]
             res = res.split("\n")[0]
-            if res[-1] == ".": res = res[:-1]
+            if res[-1] == ".":
+                res = res[:-1]
             weights.append(float(res))
         except:
             pdb.set_trace()
@@ -40,6 +42,7 @@ def process_batch(file_response):
         #         pdb.set_trace()
     assert len(weights) == num_weights
     return weights
+
 
 class Experiment:
     def __init__(
@@ -79,9 +82,7 @@ class Experiment:
         # turn the df to text and save
 
         np.random.seed(self.random_seed)
-        train_indices = np.random.choice(
-            len(self.train_csv), size=min(1000, len(self.train_csv)), replace=False
-        )
+        train_indices = np.random.choice(len(self.train_csv), size=min(1000, len(self.train_csv)), replace=False)
 
         train = self.train_csv.iloc[train_indices].reset_index(drop=True)
 
@@ -114,10 +115,9 @@ class Experiment:
 
         results = []
 
-        full_messages = [] # if llama, we can do batch runs in much faster time
+        full_messages = []  # if llama, we can do batch runs in much faster time
 
         for s in tqdm(strs):
-
             full_prompt = f"Consider the following individual from the dataset, keeping in mind that you will use this information to answer a binary classification question. {s} {prompt}"
             messages = [
                 {"role": "system", "content": context},
@@ -125,35 +125,31 @@ class Experiment:
             ]
 
             if "openai" in self.model:
-                response = client.chat.completions.create(
-                    model=self.model.split("/")[-1], messages=messages
-                )
+                response = client.chat.completions.create(model=self.model.split("/")[-1], messages=messages)
                 results.append(response.choices[0].message.content)
             else:
-                assert("mistral" in self.model)
+                assert "mistral" in self.model
                 full_messages.append(messages)
 
-        if "openai" not in self.model: # run llama inference in batch, after collecting prompts
+        if "openai" not in self.model:  # run llama inference in batch, after collecting prompts
             pipeline = transformers.pipeline(
                 "text-generation",
                 model=self.model,
                 model_kwargs={"torch_dtype": torch.bfloat16},
                 device="cuda",
                 token=token,
-                batch_size=8
+                batch_size=8,
             )
             pipeline.tokenizer.pad_token_id = pipeline.model.config.eos_token_id
             outputs = pipeline(
                 full_messages,
                 max_new_tokens=64,
             )
-            results = [response[0]['generated_text'][-1]['content'] for response in outputs]
+            results = [response[0]["generated_text"][-1]["content"] for response in outputs]
 
         uncertainty_scores = process_batch(results)
         df = pd.DataFrame({"uncertainty_score": uncertainty_scores})
         output_str = artifacts_dir / f"{self.experiment_name}"
         output_path = Path(output_str)
         output_path.mkdir(parents=True, exist_ok=True)
-        df.to_csv(
-            output_str / "uncertainty_scores.csv", index=False
-        )
+        df.to_csv(output_str / "uncertainty_scores.csv", index=False)

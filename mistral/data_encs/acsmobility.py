@@ -1,7 +1,10 @@
 from enum import Enum
+
 from folktexts.col_to_text import ColumnToText
-from folktexts.qa_interface import MultipleChoiceQA, Choice, DirectNumericQA
+from folktexts.qa_interface import Choice, DirectNumericQA, MultipleChoiceQA
+
 from data_encs.acsencodings import Encodings
+
 
 OUTCOMES = ["MIG"]
 
@@ -67,12 +70,7 @@ class ColumnsEncoding(Enum):
     )
 
     disability_col = ColumnToText(
-        "DIS",
-        short_description="disability status",
-        value_map={
-            1: "With a disability",
-            2: "Without a disability"
-        }
+        "DIS", short_description="disability status", value_map={1: "With a disability", 2: "Without a disability"}
     )
 
     parent_col = ColumnToText(
@@ -87,8 +85,8 @@ class ColumnsEncoding(Enum):
             7: "Living with mother: Mother in the labor force",
             6: "Living with father: Father not in labor force",
             1: "Living with two parents: Both parents in labor force",
-            3: "Living with two parents: Mother only in labor force"
-        }
+            3: "Living with two parents: Mother only in labor force",
+        },
     )
 
     citizen_col = ColumnToText(
@@ -99,8 +97,8 @@ class ColumnsEncoding(Enum):
             2: "Born in Puerto Rico, Guam, the U.S. Virgin Islands, or the Northern Marianas",
             4: "U.S. citizen by naturalization",
             1: "Born in the U.S.",
-            5: "Not a citizen of the U.S."
-        }
+            5: "Not a citizen of the U.S.",
+        },
     )
 
     military_col = ColumnToText(
@@ -111,8 +109,8 @@ class ColumnsEncoding(Enum):
             1: "Now on active duty",
             4: "Never served in the military",
             2: "On active duty in the past, but not now",
-            3: "Only on active duty for training in Reserves/National Guard"        
-        }
+            3: "Only on active duty for training in Reserves/National Guard",
+        },
     )
 
     ancestry_col = ColumnToText(
@@ -123,45 +121,23 @@ class ColumnsEncoding(Enum):
             8: "Suppressed for data year 2018 for select PUMAs",
             3: "Unclassified",
             2: "Multiple",
-            1: "Single"
-        }
+            1: "Single",
+        },
     )
 
     nativity_col = ColumnToText(
-        "NATIVITY",
-        short_description="nativity for US",
-        value_map={
-            2: "Foreign born",
-            1: "Native"        
-        }
+        "NATIVITY", short_description="nativity for US", value_map={2: "Foreign born", 1: "Native"}
     )
 
     RELP_COL = ColumnToText(
         "RELP",
         short_description="relationship to head of household",
-        value_map={
-            k: v + " of head of household"
-            for k, v in (Encodings.RELP_DICT.value).items()
-        },
+        value_map={k: v + " of head of household" for k, v in (Encodings.RELP_DICT.value).items()},
     )
 
-    hearing_col = ColumnToText(
-        "DEAR",
-        short_description="hearing difficulty",
-        value_map={
-            2: "No",
-            1: "Yes"        
-        }
-    )
+    hearing_col = ColumnToText("DEAR", short_description="hearing difficulty", value_map={2: "No", 1: "Yes"})
 
-    eye_col = ColumnToText(
-        "DEYE",
-        short_description="vision difficulty",
-        value_map={
-            2: "No",
-            1: "Yes"        
-        }
-    )
+    eye_col = ColumnToText("DEYE", short_description="vision difficulty", value_map={2: "No", 1: "Yes"})
 
     cognitive_col = ColumnToText(
         "DREM",
@@ -170,7 +146,7 @@ class ColumnsEncoding(Enum):
             2: "No",
             1: "Yes",
             0: "N/A (less than 5 years old)",
-        }
+        },
     )
 
     RACE_COL = ColumnToText(
@@ -192,11 +168,7 @@ class ColumnsEncoding(Enum):
     GCL_COL = ColumnToText(
         "GCL",
         short_description="Grandparents living with grandchildren",
-        value_map={
-            0: "N/A (less than 30 years/institutional GQ)",
-            1: "Yes",
-            2: "No"
-        }
+        value_map={0: "N/A (less than 30 years/institutional GQ)", 1: "Yes", 2: "No"},
     )
 
     COW_COL = ColumnToText(
@@ -226,8 +198,8 @@ class ColumnsEncoding(Enum):
             1: "Civilian employed, at work",
             6: "Not in Labor Force",
             0: "N/A (less than 16 years old)",
-            4: "Armed Forces, At Work"
-        }
+            4: "Armed Forces, At Work",
+        },
     )
 
     WKHP_COL = ColumnToText(
@@ -243,24 +215,15 @@ class ColumnsEncoding(Enum):
     )
 
     JWMNP_COL = ColumnToText(
-        "JWMNP",
-        short_description="travel time to work in minutes",
-        value_map=lambda x: f"{x} minutes"
+        "JWMNP", short_description="travel time to work in minutes", value_map=lambda x: f"{x} minutes"
     )
 
-    INCOME_COL = ColumnToText(
-        "PINCP",
-        short_description="annual income in US dollars",
-        value_map=lambda x: f"${x}"
-    )
+    INCOME_COL = ColumnToText("PINCP", short_description="annual income in US dollars", value_map=lambda x: f"${x}")
 
     MIG_COL = ColumnToText(
         "MIG",
         short_description="Mobility status (lived here 1 year ago)",
-        value_map={
-            1: "Yes, same house",
-            0: "No, lived somewhere else 1 year ago"
-        }
+        value_map={1: "Yes, same house", 0: "No, lived somewhere else 1 year ago"},
     )
 
 
@@ -278,5 +241,6 @@ class Reentry(Enum):
         column="MIG",
         text=("Did this person have the same residential address 1 year ago?"),
     )
+
 
 discretize_cols = ["AGEP", "WKHP", "JWMNP", "PINCP"]

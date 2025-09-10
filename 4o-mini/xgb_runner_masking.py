@@ -1,25 +1,29 @@
-import os
-from xgboost import XGBClassifier
-from matplotlib import pyplot as plt
-import xgboost as xgb
-import pandas as pd
-from pathlib import Path
 import importlib
+import os
+import pickle
+from pathlib import Path
+
+import numpy as np
+import pandas as pd
+import xgboost as xgb
+from matplotlib import pyplot as plt
 from sklearn.metrics import roc_auc_score
 from tqdm import tqdm
-import numpy as np
-import pickle
+from xgboost import XGBClassifier
+
+
 data_folder = Path("data")
 
 if __name__ == "__main__":
-
     auc_per_dataset = {}
 
     for f in tqdm(os.listdir(data_folder)):
         print(f)
         data = pd.read_csv(data_folder / f)
 
-        data[data.select_dtypes(include=['object']).columns] = data.select_dtypes(include=['object']).astype('category')
+        data[data.select_dtypes(include=["object"]).columns] = data.select_dtypes(include=["object"]).astype(
+            "category"
+        )
 
         # get the outcome variable from data encoding
         dataset_name = f.split(".csv")[0]
@@ -27,9 +31,7 @@ if __name__ == "__main__":
         outcome = data_encodings.OUTCOMES[0]
         column_encodings = data_encodings.ColumnsEncoding
         discretize_cols = data_encodings.discretize_cols
-        columns_map: dict[str, object] = {
-            col_mapper.value: col_mapper.value for col_mapper in column_encodings
-        }
+        columns_map: dict[str, object] = {col_mapper.value: col_mapper.value for col_mapper in column_encodings}
 
         # subset to include only columns in the data_encs file
         usable_features = set(columns_map[x]._name for x in columns_map)
@@ -38,12 +40,12 @@ if __name__ == "__main__":
         data = data[usable_features]
 
         # Characters to replace
-        banned_chars = [']', '[', ',', '<']
+        banned_chars = ["]", "[", ",", "<"]
 
         # Replace each banned character with an underscore (or any other character)
         def clean_column(col):
             for ch in banned_chars:
-                col = col.replace(ch, '_')  # Replace with underscore
+                col = col.replace(ch, "_")  # Replace with underscore
             return col
 
         # Apply to all column names
@@ -69,34 +71,31 @@ if __name__ == "__main__":
         # for each dataset, get each sampled outcome variable
         mask_dir = Path(f"past_results/gpt_masking")
         exp_name = f"{f.split('.')[0]}_masking"
-        assert(len(os.listdir(mask_dir / exp_name)) == 1)
+        assert len(os.listdir(mask_dir / exp_name)) == 1
         timestamp = os.listdir(mask_dir / exp_name)[0]
         openai_dir = Path(f"{mask_dir}/{exp_name}/{timestamp}")
         masking_pickle = openai_dir / "all_results.pickle"
-        with open(masking_pickle, 'rb') as handle:
+        with open(masking_pickle, "rb") as handle:
             masking_results = pickle.load(handle)
-        
-        used_cols = [''.join(col.split("_binary")[:-1]) for col in masking_results]
+
+        used_cols = ["".join(col.split("_binary")[:-1]) for col in masking_results]
 
         # iterate through each sampled variable, make the binary version, and run xgb on the binary version using all other variables
         for col in used_cols:
-
             filtered_data = data[data[col].notnull()]
             filtered_train, filtered_test = train[train[col].notnull()], test[test[col].notnull()]
 
             options_set = list(set(data[col].tolist()))
             final_col_name = f"{col}_binary"
 
-            if (
-                len(options_set) == 2
-            ):  # already binary; use the 2 options to make a yes/no question
+            if len(options_set) == 2:  # already binary; use the 2 options to make a yes/no question
                 positive, negative = max(options_set), min(options_set)
-                filtered_train[final_col_name] = (
-                    filtered_train[col] == positive
-                ).astype(int)  # positive -> 1; negative -> 0
-                filtered_test[final_col_name] = (
-                    filtered_test[col] == positive
-                ).astype(int)  # positive -> 1; negative -> 0
+                filtered_train[final_col_name] = (filtered_train[col] == positive).astype(
+                    int
+                )  # positive -> 1; negative -> 0
+                filtered_test[final_col_name] = (filtered_test[col] == positive).astype(
+                    int
+                )  # positive -> 1; negative -> 0
 
             elif col in discretize_cols:  # numerical value; use the median
                 try:
@@ -108,7 +107,9 @@ if __name__ == "__main__":
                         filtered_test[col] = pd.to_datetime(filtered_test[col])
                         median = filtered_data[col].median()
                 except:
-                    import pdb; pdb.set_trace()
+                    import pdb
+
+                    pdb.set_trace()
                 try:
                     filtered_train[final_col_name] = (filtered_train[col] > median).astype(
                         int
@@ -117,7 +118,9 @@ if __name__ == "__main__":
                         int
                     )  # if median above, say 1; otherwise 0
                 except:
-                    import pdb; pdb.set_trace()
+                    import pdb
+
+                    pdb.set_trace()
 
             else:  # categorical variable; take the mode and binarize this
                 mode = filtered_data[col].mode().iloc[0]
@@ -128,8 +131,12 @@ if __name__ == "__main__":
                     int
                 )  # if equal to mode say 1; otherwise 0
 
-            train_new = filtered_train.drop(col, axis="columns") # get rid of original col, which was used to make the binary outcome
-            test_new = filtered_test.drop(col, axis="columns") # get rid of original col, which was used to make the binary outcome
+            train_new = filtered_train.drop(
+                col, axis="columns"
+            )  # get rid of original col, which was used to make the binary outcome
+            test_new = filtered_test.drop(
+                col, axis="columns"
+            )  # get rid of original col, which was used to make the binary outcome
 
             y_train = train_new[final_col_name]
             x_train = train_new.drop(final_col_name, axis="columns")
@@ -140,7 +147,7 @@ if __name__ == "__main__":
 
             pre_augmentation_model.fit(x_train, y_train)
 
-            probs = pre_augmentation_model.predict_proba(x_test)[:,1]
+            probs = pre_augmentation_model.predict_proba(x_test)[:, 1]
 
             # collect auc
             auc = roc_auc_score(y_test.to_numpy(), probs)
