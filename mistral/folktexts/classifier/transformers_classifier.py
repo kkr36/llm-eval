@@ -122,7 +122,6 @@ class TransformersLLMClassifier(LLMClassifier):
         risk_estimates : np.ndarray
             The risk estimates for each prompt in the batch.
         """
-        # TODO: Add support for any unicode character used as a prefix to " A".
 
         # Query model
         # import pdb; pdb.set_trace()

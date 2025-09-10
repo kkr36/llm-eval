@@ -212,10 +212,10 @@ class TaskMetadata:
             logging.critical(f"No Q&A interface provided for task {self.name}.")
         return q
 
-    def get_row_description(self, row: pd.Series) -> str:  # TODO make this only use non-nan columns per row
+    def get_row_description(self, row: pd.Series) -> str:
         """Encode a description of a given data row in textual form."""
         row = row[self.features]
-        # row = row[row != "?"].dropna() # TODO confirm that dropping nan/uncollected variables is fine
+        # row = row[row != "?"].dropna()
 
         res = "\n".join("- " + self.cols_to_text[col].get_text(val) for col, val in row.items())
         ### TEXT TEMPLATE
@@ -227,9 +227,9 @@ class TaskMetadata:
 
         return res
 
-    def get_row_description_blank(self, row: pd.Series) -> str:  # TODO make this only use non-nan columns per row
+    def get_row_description_blank(self, row: pd.Series) -> str:
         row = row[self.features]
-        # row = row[row != "?"].dropna() # TODO confirm that dropping nan/uncollected variables is fine
+        # row = row[row != "?"].dropna()
 
         res = "\n".join(
             "- " + self.cols_to_text[col].short_description + " " + self.cols_to_text[col]._connector_verb + " <VALUE>"

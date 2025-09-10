@@ -641,7 +641,6 @@ acs_gcl_col = ColumnToText(
 )
 
 # PUMA: Public Use Microdata Area Code
-# TODO: assign meaningful natural-text values to PUMA codes
 # > Consult: https://www2.census.gov/geo/pdfs/reference/puma/2010_PUMA_Names.pdf
 acs_puma_col = ColumnToText(
     "PUMA",

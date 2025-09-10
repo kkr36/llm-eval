@@ -224,7 +224,6 @@ class WebAPILLMClassifier(LLMClassifier):
         #     ]
 
         #     # Query the model API
-        #     # TODO: Retry on non-successful API calls (e.g., RPM exceeded).
         #     response = self.text_completion_api(
         #         model=self.model_name,
         #         messages=messages,

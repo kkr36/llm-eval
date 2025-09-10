@@ -91,7 +91,7 @@ if __name__ == "__main__":
             filtered_train, filtered_test = (
                 train[train[col].notnull()],
                 test[test[col].notnull()],
-            )  # TODO add unique identifier
+            )
 
             options_set = list(set(data[col].tolist()))
             final_col_name_full = f"{real_col}_binary"

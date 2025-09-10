@@ -292,7 +292,6 @@ def evaluate_predictions(
     results["roc_auc"] = float(roc_auc_score(y_true, y_pred_scores))
 
     # Compute Expected Calibration Error
-    # TODO: re-implement ECE scorer to avoid including 10 other dependencies for this one metric...
     class_preds = np.stack([1 - y_pred_scores, y_pred_scores], axis=1)
     n_bins = 10
     results["ece"] = ECE(bins=n_bins, equal_intervals=True).measure(class_preds, y_true)

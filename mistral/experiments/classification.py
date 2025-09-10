@@ -12,9 +12,6 @@ from folktexts.dataset import Dataset
 from folktexts.task import TaskMetadata
 
 
-# TODO Perhaps this will evolve into an abstract class?
-
-
 def execute_experiment(
     model,
     artifacts_dir,
@@ -59,7 +56,6 @@ def execute_experiment(
         direct_numeric_qa=reentry_numeric_qa,
     )
 
-    # TODO We need to handle the subsampling way better
     reentry_dataset = Dataset(
         data=data,
         task=reentry_task,

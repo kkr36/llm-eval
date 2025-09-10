@@ -87,7 +87,6 @@ def execute_experiment(
     # randomly sample columns, in case there's too many covariates
     random.seed(config.random_seed)
 
-    # TODO: figure out how to get all usable columns (all columns - ban_cols), then sample from this
     usable_columns = set(all_columns_map.keys())
     usable_columns = usable_columns.difference(set(ban_cols))
     usable_columns_map = {k: all_columns_map[k] for k in usable_columns}
@@ -218,7 +217,7 @@ def execute_experiment(
             direct_numeric_qa=numeric_q,
         )
 
-        task.use_numeric_qa = False  # TODO confirm this means we don't use the direct numeric question
+        task.use_numeric_qa = False
 
         dataset = Dataset(
             data=filtered_data,

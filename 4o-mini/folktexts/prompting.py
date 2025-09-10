@@ -134,7 +134,6 @@ def encode_row_prompt_chat(
     question: QAInterface = None,
     **chat_template_kwargs,
 ) -> str:
-    # TODO: implement two functions
     # - one for gemma-like models that are not compatible with system prompts
     # - and another for regular models compatible with system prompts
     logging.warning("NOTE :: Untested feature!!")

@@ -19,7 +19,7 @@ def process_batch(file_response):
     num_weights = len(file_response)
     weights = []
 
-    for response in tqdm(file_response):  # TODO put weights in order; by the key
+    for response in tqdm(file_response):
         try:
             res = response.split("Probability: ")[-1]
             res = res.split("\n")[0]

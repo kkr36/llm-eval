@@ -6,9 +6,6 @@ from pathlib import Path
 
 import pandas as pd
 from config import Config
-
-
-# TODO (Santiago) add typing
 def run_experiment(config: Config):
     experiment_name = config.experiment
     exp_import_str = (
@@ -21,8 +18,7 @@ def run_experiment(config: Config):
     dataset = config.dataset
     data = pd.read_csv(f"../data/{dataset}.csv")
 
-    # TODO Create interface to change the model (Santiago)
-    # TODO integrate AWS Bedrock (Santiago)
+    
     # Is there a better way to use the API keys?
     with open("../secrets.json", "r") as f:
         keys = json.load(f)
@@ -122,7 +118,6 @@ def run_experiment(config: Config):
         )
         experiment.get_weights(artifacts_dir)
 
-    # TODO (Carlos) connect to Google drive SDFK or whichever place we are using to stroe this
     if exp_import_str != "no_data":
         with open(artifacts_dir / "config.json", "w") as f:
             json.dump(config_dict, f, indent=4)
@@ -131,7 +126,6 @@ def run_experiment(config: Config):
 
 if __name__ == "__main__":
     parser = ArgumentParser(description="Run experiments with JSON configuration.")
-    # TODO (Carlos) Should we move the model and datset to the argparser?
     parser.add_argument("config", help="Path to the JSON configuration file")
     args = parser.parse_args()
 

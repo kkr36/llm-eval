@@ -18,7 +18,6 @@ def setup_arg_parser() -> ArgumentParser:
         help="[string] Path to an experiment JSON file to load.",
         required=True,
     )
-    # TODO: add over-writable key-word arguments
 
     return parser
 
