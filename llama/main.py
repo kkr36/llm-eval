@@ -6,8 +6,13 @@ from pathlib import Path
 
 import pandas as pd
 from config import Config
+from dotenv import load_dotenv
+
+
 def run_experiment(config: Config):
     experiment_name = config.experiment
+    # Load environment variables from a .env file if present
+    load_dotenv()
     exp_import_str = (
         "no_data"
         if "auc" in experiment_name or "score" in experiment_name or "probs" in experiment_name
@@ -18,12 +23,7 @@ def run_experiment(config: Config):
     dataset = config.dataset
     data = pd.read_csv(f"../data/{dataset}.csv")
 
-    
-    # Is there a better way to use the API keys?
-    with open("secrets.json", "r") as f:
-        keys = json.load(f)
-    os.environ["OPENAI_API_KEY"] = keys["open_ai_key"]
-    os.environ["HUGGINGFACE_TOKEN"] = keys["huggingface_token"]
+    # Credentials are expected in environment variables (loaded via .env if present)
 
     timestamp = pd.Timestamp.now().strftime("%m%d%H%M")
     artifacts_dir = Path("results") / f"{dataset}_{experiment_name}" / timestamp
