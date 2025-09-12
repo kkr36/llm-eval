@@ -37,7 +37,6 @@ def query_model_batch(
         Model's last token *linear* probabilities for each input as an
         np.array of shape (batch_size, vocab_size).
     """
-    # import pdb; pdb.set_trace()
     model_device = next(model.parameters()).device
 
     # Tokenize

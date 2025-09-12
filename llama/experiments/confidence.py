@@ -134,7 +134,6 @@ class Experiment:
                 max_new_tokens=64,
             )
             results = [response[0]["generated_text"][-1]["content"] for response in outputs]
-            # import pdb; pdb.set_trace()
 
         uncertainty_scores = process_batch(results)
         df = pd.DataFrame({"uncertainty_score": uncertainty_scores})

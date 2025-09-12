@@ -50,7 +50,6 @@ if __name__ == "__main__":
                 (risk_score_df["risk_score"] >= upper_bound) | (risk_score_df["risk_score"] <= lower_bound)
             ]
 
-            # import pdb; pdb.set_trace()
 
             risk_scores = subset["risk_score"].tolist()
             labels = subset["label"].tolist()

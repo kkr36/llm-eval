@@ -42,10 +42,6 @@ def execute_experiment(
     # for each column calculate auc; take an average
 
     ban_cols = [outcomes[0]]  # whole point is to not use outcome col
-    # if "subsampling" in config.additional_params:
-    #     subsampling = (float(config.additional_params["subsampling"]) / 0.95) / len(
-    #         data
-    #     )
     num_data = len(data)
 
     if num_data > 1000:
@@ -55,9 +51,6 @@ def execute_experiment(
 
     for col in data.columns:
         # apply null threshold
-        # if data[col].isnull().mean() >= float(
-        #     config.additional_params["null_threshold"]
-        # ):
         if data[col].isnull().mean() >= 0.7:
             ban_cols.append(col)
             continue
@@ -90,16 +83,11 @@ def execute_experiment(
     usable_columns_map = {k: all_columns_map[k] for k in usable_columns}
     del all_columns_map[outcomes[0]]
 
-    # sample_size = min(10, len(usable_columns_map))
-    # sampled_cols = random.sample(sorted(list(usable_columns_map.items())), sample_size)
-
     with open(f"xgb_pickles/{config.dataset}.pickle", "rb") as handle:
         gpt_res = pickle.load(handle)
     sampled_cols = [
         ("".join(key.split("_binary")[:-1]), usable_columns_map["".join(key.split("_binary")[:-1])]) for key in gpt_res
     ]
-    # import pdb; pdb.set_trace()
-
     for col_name, col in sampled_cols:
         if col.name in ban_cols:
             continue  # skip the ones that can't be discretized

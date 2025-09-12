@@ -28,18 +28,6 @@ def process_batch(file_response):
             weights.append(float(res))
         except:
             pdb.set_trace()
-        # try:
-        #     res = response.split("Probability:")[-1].split('.')[0].split('\n')[0]
-        #     import pdb; pdb.set_trace()
-        #     # if res[-1] == '.': res = res[:-1]
-        #     weights.append(float(res))
-        # except:
-        #     try:
-        #         res = response.split("\n")[-1]
-        #         weights.append(float(res))
-        #         import pdb; pdb.set_trace()
-        #     except:
-        #         pdb.set_trace()
     assert len(weights) == num_weights
     return weights
 

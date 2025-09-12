@@ -208,31 +208,13 @@ class WebAPILLMClassifier(LLMClassifier):
             ]
             for prompt in prompts_batch
         ]
-        # import pdb; pdb.set_trace()
         responses_batch = self.batch_completion(
             model=self.model_name,
             messages=messages,
             **api_call_params,
         )
 
-        # for prompt in prompts_batch:
-
-        #     # Construct prompt messages object
-        #     messages = [
-        #         {"role": "system", "content": system_prompt},
-        #         {"role": "user", "content": prompt},
-        #     ]
-
-        #     # Query the model API
-        #     response = self.text_completion_api(
-        #         model=self.model_name,
-        #         messages=messages,
-        #         **api_call_params,
-        #     )
-        #     responses_batch.append(response)
-
-        #     # Sleep for short period to avoid rate-limiting (max 5K RPM for OpenAI API)
-        #     time.sleep(60 / self.max_api_rpm)
+        
 
         return responses_batch
 

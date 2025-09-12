@@ -215,21 +215,12 @@ class TaskMetadata:
     def get_row_description(self, row: pd.Series) -> str:
         """Encode a description of a given data row in textual form."""
         row = row[self.features]
-        # row = row[row != "?"].dropna()
 
         res = "\n".join("- " + self.cols_to_text[col].get_text(val) for col, val in row.items())
-        ### TEXT TEMPLATE
-        # res = " ".join(
-        #     self.cols_to_text[col].get_text(val) for col, val in row.items()
-        # )
-
-        # import pdb;pdb.set_trace()
-
         return res
 
     def get_row_description_blank(self, row: pd.Series) -> str:
         row = row[self.features]
-        # row = row[row != "?"].dropna()
 
         res = "\n".join(
             "- " + self.cols_to_text[col].short_description + " " + self.cols_to_text[col]._connector_verb + " <VALUE>"

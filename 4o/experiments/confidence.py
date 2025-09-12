@@ -101,8 +101,6 @@ class Experiment:
                 {"role": "user", "content": full_prompt},
             ]
 
-            # import pdb; pdb.set_trace()
-
             response = client.chat.completions.create(model=self.model.split("/")[-1], messages=messages)
             results.append(response.choices[0].message.content)
 

@@ -25,7 +25,6 @@ if __name__ == "__main__":
         assert len(os.listdir(masking_dir / f)) == 1
         timestamp = os.listdir(masking_dir / f)[0]
         timestamp_dir = Path(f"{masking_dir}/{f}/{timestamp}")
-        # import pdb; pdb.set_trace()
         for exp_f in os.listdir(timestamp_dir):
             if ".pickle" in exp_f or ".json" in exp_f:
                 continue

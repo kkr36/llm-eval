@@ -115,7 +115,6 @@ class Experiment:
             {"role": "user", "content": full_prompt},
         ]
 
-        # import pdb; pdb.set_trace()
 
         response = client.chat.completions.create(
             model=self.model.split("/")[-1],
@@ -125,8 +124,7 @@ class Experiment:
             top_logprobs=10,
             temperature=0,
         )
-        # import pdb; pdb.set_trace()
-        # results.append(response.choices[0].message.content)
+        
         if "score" in self.experiment_name:
             assert len(response.choices[0].message.content) == 1
             logprobs = response.choices[0].logprobs.content[0].top_logprobs
@@ -142,29 +140,22 @@ class Experiment:
             probs = [x / sum(probs) for x in probs]  # normalize by probs over numerical values
             score = np.dot(numericals, probs)
         else:
-            # import pdb; pdb.set_trace()
-            # skip decimal point; get next 2
+            # Skip decimal point; get next 2
             assert len(response.choices[0].logprobs.content) == 2
             logprobs = response.choices[0].logprobs.content[1].top_logprobs
 
-            # logprobs = response.choices[0].logprobs.content[0].top_logprobs
             numericals, probs = [], []
-            # div_amt = 1
             for logprob_obj in logprobs:
                 try:
                     candidate_score = float(f"0.{logprob_obj.token}")
                     candidate_prob = np.exp(logprob_obj.logprob)
                     numericals.append(candidate_score)
                     probs.append(candidate_prob)
-                # div_amt *= 10 # each successive logprob represents a smaller decimal place
                 except:
                     print(f"{logprob_obj.token} was not numerical; skipping")
-            # import pdb; pdb.set_trace()
             probs = [x / sum(probs) for x in probs]  # normalize by probs over numerical values
             score = np.dot(numericals, probs)
 
-        # score = process_batch(results)
-        # import pdb; pdb.set_trace()
         df = pd.DataFrame({"dataset_name": self.config.dataset, "rating": score}, index=[0])
         output_str = Path("results") / f"""{self.experiment_name.split("_")[-1]}_logprob.csv"""
         if not os.path.exists(output_str):

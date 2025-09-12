@@ -41,25 +41,15 @@ def run_experiment(config: Config):
         context = task_prompts.CONTEXT
         experiment = importlib.import_module(f"experiments.no_data").Experiment(
             model=model,
-            # artifacts_dir=artifacts_dir,
             data=data,
             column_encodings=column_encodings,
             reentries=reentries,
-            # outcomes=outcomes,
             random_seed=int(config.random_seed),
             question=question,
             config=config,
-            # model=config.model,
-            # train_csv_path=data_encodings.train_csv_path,
-            # column_ordering=data_encodings.column_ordering,
-            # discrete_columns=data_encodings.discrete_columns,
             experiment_name=experiment_name,
             context=context,
             outcome=outcomes,
-            # serialization_fn=data_encodings.serialization_fn,
-            # additional_info_fn=data_encodings.additional_info_fn,
-            # prompt=task_prompt,
-            # process_batch_fn=data_encodings.process_batch_fn
         )
         experiment.get_weights(artifacts_dir)
     elif "masking" in experiment_name:
@@ -96,25 +86,16 @@ def run_experiment(config: Config):
         task_context = task_prompts.CONTEXT
         experiment = importlib.import_module(f"experiments.{experiment_name}").Experiment(
             model=model,
-            # artifacts_dir=artifacts_dir,
             data=data,
             column_encodings=column_encodings,
             reentries=reentries,
-            # outcomes=outcomes,
             random_seed=int(config.random_seed),
             task_prompt=task_prompts.TASK_DESCRIPTION,
             config=config,
-            # model=config.model,
-            # train_csv_path=data_encodings.train_csv_path,
-            # column_ordering=data_encodings.column_ordering,
-            # discrete_columns=data_encodings.discrete_columns,
             experiment_name=experiment_name,
             outcome=outcomes,
             context=task_context,
-            # serialization_fn=data_encodings.serialization_fn,
-            # additional_info_fn=data_encodings.additional_info_fn,
             prompt=task_prompt,
-            # process_batch_fn=data_encodings.process_batch_fn
         )
         experiment.get_weights(artifacts_dir)
 

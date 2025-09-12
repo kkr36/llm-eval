@@ -34,7 +34,6 @@ def generate_probs(model_path, input_string):
     #     max_new_tokens=64,
     # )
     # results = [response[0]['generated_text'][-1]['content'] for response in outputs]
-    # import pdb; pdb.set_trace()
 
     tokenizer = AutoTokenizer.from_pretrained(model_path, use_safetensors=True)
     model = AutoModelForCausalLM.from_pretrained(model_path, use_safetensors=True)

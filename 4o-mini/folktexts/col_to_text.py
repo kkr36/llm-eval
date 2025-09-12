@@ -132,7 +132,5 @@ class ColumnToText:
         """Returns the natural text representation of the given data value."""
         if self._use_value_map_only:
             return self[value]
-        # import pdb; pdb.set_trace()
-        # return f"The {self.short_description} {self._connector_verb} {self[value]}."
         ### LIST TEMPLATE
         return f"{self.short_description}: {self[value]}."

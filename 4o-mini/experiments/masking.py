@@ -43,10 +43,6 @@ def execute_experiment(
     # for each column calculate auc; take an average
 
     ban_cols = [outcomes[0]]  # whole point is to not use outcome col
-    # if "subsampling" in config.additional_params:
-    #     subsampling = (float(config.additional_params["subsampling"]) / 0.95) / len(
-    #         data
-    #     )
     num_data = len(data)
 
     if num_data > 1000:
@@ -56,9 +52,6 @@ def execute_experiment(
 
     for col in data.columns:
         # apply null threshold
-        # if data[col].isnull().mean() >= float(
-        #     config.additional_params["null_threshold"]
-        # ):
         if data[col].isnull().mean() >= 0.7:
             ban_cols.append(col)
             continue

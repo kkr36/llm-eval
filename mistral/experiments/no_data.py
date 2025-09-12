@@ -103,7 +103,7 @@ class Experiment:
         Give ONLY the guess, no other words or explanation. For example:
         \n\n<most likely guess, as short as possible; not a complete sentence, just the guess!>
         \n\nThe question is: {question}"""
-        # prompt = ""
+        
 
         results = []
 
@@ -122,7 +122,6 @@ class Experiment:
                 temperature=0,
             )
 
-            # results.append(response.choices[0].message.content)
             if "score" in self.experiment_name:
                 assert len(response.choices[0].message.content) == 1
                 logprobs = response.choices[0].logprobs.content[0].top_logprobs
@@ -138,11 +137,10 @@ class Experiment:
                 probs = [x / sum(probs) for x in probs]  # normalize by probs over numerical values
                 score = np.dot(numericals, probs)
             else:
-                # skip decimal point; get next 2
+                # Skip decimal point; get next 2
                 assert len(response.choices[0].logprobs.content) == 2
                 logprobs = response.choices[0].logprobs.content[1].top_logprobs
 
-                # logprobs = response.choices[0].logprobs.content[0].top_logprobs
                 numericals, probs = [], []
                 for logprob_obj in logprobs:
                     try:
@@ -156,14 +154,12 @@ class Experiment:
                 score = np.dot(numericals, probs)
         else:
             assert "mistral" in self.model
-            # import pdb; pdb.set_trace()
 
             full_prompt = (
                 context + " " + prompt + "answer: "
                 if "score" in self.experiment_name
                 else context + " " + prompt + "answer: ."
             )
-            # import pdb; pdb.set_trace()
             candidate_probs = generate_probs(self.model, full_prompt)
             numericals, probs = [], []
             for token, candidate_prob in candidate_probs:
@@ -175,9 +171,7 @@ class Experiment:
                     print(f"{token} was not numerical; skipping")
             probs = [x / sum(probs) for x in probs]  # normalize by probs over numerical values
             score = np.dot(numericals, probs)
-            # import pdb; pdb.set_trace()
 
-            # import pdb; pdb.set_trace()
 
         df = pd.DataFrame({"dataset_name": self.config.dataset, "rating": score}, index=[0])
         output_str = Path("results") / f"""{self.experiment_name.split("_")[-1]}_logprob.csv"""

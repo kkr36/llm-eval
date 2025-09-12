@@ -20,8 +20,5 @@ if __name__ == "__main__":
     for json_path in os.listdir(f"configs/{args.run_name}"):
         # if "score" in json_path:
         if json_path.split("_")[0] not in existing_runs:
-            # import pdb; pdb.set_trace()
             print(f"RUNNING CONFIG {json_path}")
             subprocess.run(["python", "main.py", f"configs/{args.run_name}/{json_path}"])
-        # else:
-        #     print(f"{json_path} already run")

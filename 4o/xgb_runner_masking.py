@@ -159,11 +159,6 @@ if __name__ == "__main__":
 
             # collect auc
             auc = roc_auc_score(y_test.to_numpy(), probs)
-            # if auc == 1:
-            #     import pdb; pdb.set_trace()
-
-            # add it back to the pickle and resave?
             masking_results[final_col_name_full]["xgb_auc"] = auc
-        # import pdb; pdb.set_trace()
         with open(Path("xgb_pickles_4o") / f"{dataset_name}.pickle", "wb") as g:
             pickle.dump(masking_results, g)

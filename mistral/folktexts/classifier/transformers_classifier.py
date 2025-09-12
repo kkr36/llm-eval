@@ -124,7 +124,6 @@ class TransformersLLMClassifier(LLMClassifier):
         """
 
         # Query model
-        # import pdb; pdb.set_trace()
         last_token_probs_batch = query_model_batch_multiple_passes(
             text_inputs=prompts_batch,
             model=self.model,
