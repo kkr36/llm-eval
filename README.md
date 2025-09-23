@@ -1,6 +1,8 @@
 # Predicting Language Models’ Success at Zero-Shot Probabilistic Prediction
 
-This repository collects the scripts and configs used to reproduce the experiments from the paper **Predicting Language Models’ Success at Zero-Shot Probabilistic Prediction** across
+[![arXiv](https://img.shields.io/badge/arXiv-2509.15356-b31b1b.svg)](https://arxiv.org/abs/2509.15356)
+
+This repository collects the scripts and configs used to reproduce the experiments from the paper [Predicting Language Models’ Success at Zero-Shot Probabilistic Prediction](https://arxiv.org/abs/2509.15356) across
 GPT-4o, GPT-4o-mini, Llama, and Mistral. Each model family lives in its own top-level directory (`4o/`,
 `4o-mini/`, `llama/`, `mistral/`), and shared analysis lives under `agreement_analysis/`.
 
