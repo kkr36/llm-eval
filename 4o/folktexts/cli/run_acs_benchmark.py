@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
-"""Runs the LLM calibration benchmark from the command line.
-"""
+"""Runs the LLM calibration benchmark from the command line."""
+
 import json
 import logging
 import sys
 from argparse import ArgumentParser
 from pathlib import Path
+
 
 DEFAULT_ACS_TASK = "ACSIncome"
 
@@ -15,26 +16,25 @@ DEFAULT_SEED = 42
 
 
 def setup_arg_parser() -> ArgumentParser:
-
     # Init parser
     parser = ArgumentParser(description="Benchmark risk scores produced by a language model on ACS data.")
 
     # Define a custom argument type for a list of strings
     def list_of_strings(arg):
-        return arg.split(',')
+        return arg.split(",")
 
     # List of command-line arguments, with type and helper string
     cli_args = [
-        ("--model",         str, "[str] Model name or path to model saved on disk"),
-        ("--results-dir",   str, "[str] Directory under which this experiment's results will be saved"),
-        ("--data-dir",      str, "[str] Root folder to find datasets on"),
-        ("--task",          str, "[str] Name of the ACS task to run the experiment on", False, DEFAULT_ACS_TASK),
-        ("--few-shot",      int, "[int] Use few-shot prompting with the given number of shots", False),
-        ("--batch-size",    int, "[int] The batch size to use for inference", False, DEFAULT_BATCH_SIZE),
-        ("--context-size",  int, "[int] The maximum context size when prompting the LLM", False, DEFAULT_CONTEXT_SIZE),
+        ("--model", str, "[str] Model name or path to model saved on disk"),
+        ("--results-dir", str, "[str] Directory under which this experiment's results will be saved"),
+        ("--data-dir", str, "[str] Root folder to find datasets on"),
+        ("--task", str, "[str] Name of the ACS task to run the experiment on", False, DEFAULT_ACS_TASK),
+        ("--few-shot", int, "[int] Use few-shot prompting with the given number of shots", False),
+        ("--batch-size", int, "[int] The batch size to use for inference", False, DEFAULT_BATCH_SIZE),
+        ("--context-size", int, "[int] The maximum context size when prompting the LLM", False, DEFAULT_CONTEXT_SIZE),
         ("--fit-threshold", int, "[int] Whether to fit the prediction threshold, and on how many samples", False),
-        ("--subsampling",   float, "[float] Which fraction of the dataset to use (if omitted will use all data)", False),
-        ("--seed",          int, "[int] Random seed -- to set for reproducibility", False, DEFAULT_SEED),
+        ("--subsampling", float, "[float] Which fraction of the dataset to use (if omitted will use all data)", False),
+        ("--seed", int, "[int] Random seed -- to set for reproducibility", False, DEFAULT_SEED),
     ]
 
     for arg in cli_args:
@@ -42,8 +42,8 @@ def setup_arg_parser() -> ArgumentParser:
             arg[0],
             type=arg[1],
             help=arg[2],
-            required=(arg[3] if len(arg) > 3 else True),    # NOTE: required by default
-            default=(arg[4] if len(arg) > 4 else None),     # default value if provided
+            required=(arg[3] if len(arg) > 3 else True),  # NOTE: required by default
+            default=(arg[4] if len(arg) > 4 else None),  # default value if provided
         )
 
     # Add special arguments (e.g., boolean flags or multiple-choice args)
@@ -135,6 +135,7 @@ def main():
     population_filter_dict = None
     if args.use_population_filter:
         from folktexts.cli._utils import cmd_line_args_to_kwargs
+
         population_filter_dict = cmd_line_args_to_kwargs(args.use_population_filter)
 
     # Load model and tokenizer
@@ -146,10 +147,12 @@ def main():
     # > Local LLM
     else:
         from folktexts.llm_utils import load_model_tokenizer
+
         model, tokenizer = load_model_tokenizer(args.model)
 
     # Fill ACS Benchmark config
     from folktexts.benchmark import BenchmarkConfig
+
     config = BenchmarkConfig(
         few_shot=args.few_shot,
         numeric_risk_prompting=args.numeric_risk_prompting,
@@ -165,6 +168,7 @@ def main():
 
     # Create ACS Benchmark object
     from folktexts.benchmark import Benchmark
+
     bench = Benchmark.make_acs_benchmark(
         task_name=args.task,
         model=model,
@@ -177,6 +181,7 @@ def main():
 
     # Set-up results directory
     from folktexts.cli._utils import get_or_create_results_dir
+
     results_dir = get_or_create_results_dir(
         model_name=Path(args.model).name,
         task_name=args.task,
@@ -190,10 +195,12 @@ def main():
 
     # Save results
     import pprint
+
     pprint.pprint(bench.results, indent=4, sort_dicts=True)
 
     # Finish
     from folktexts._utils import get_current_timestamp
+
     print(f"\nFinished experiment successfully at {get_current_timestamp()}\n")
 
 

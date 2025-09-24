@@ -1,179 +1,144 @@
 import pdb
-from tqdm import tqdm
 from enum import Enum
+
 from folktexts.col_to_text import ColumnToText
-from folktexts.qa_interface import MultipleChoiceQA, Choice, DirectNumericQA
+from folktexts.qa_interface import Choice, DirectNumericQA, MultipleChoiceQA
+from tqdm import tqdm
+
 
 attributes_144 = {
-            "Attribute1": {
-                "type": "qualitative",
-                "name": "Status of existing checking account",
-                "values": {
-                    "A11": "< 0 DM",
-                    "A12": "0 <= ... < 200 DM",
-                    "A13": ">= 200 DM / salary assignments for at least 1 year",
-                    "A14": "no checking account"
-                }
-            },
-            "Attribute3": {
-                "type": "qualitative",
-                "name": "Credit history",
-                "values": {
-                    "A30": "no credits taken/ all credits paid back duly",
-                    "A31": "all credits at this bank paid back duly",
-                    "A32": "existing credits paid back duly till now",
-                    "A33": "delay in paying off in the past",
-                    "A34": "critical account/ other credits existing (not at this bank)"
-                }
-            },
-            "Attribute4": {
-                "type": "qualitative",
-                "name": "Purpose",
-                "values": {
-                    "A40": "car (new)",
-                    "A41": "car (used)",
-                    "A42": "furniture/equipment",
-                    "A43": "radio/television",
-                    "A44": "domestic appliances",
-                    "A45": "repairs",
-                    "A46": "education",
-                    "A47": "vacation (does not exist?)",
-                    "A48": "retraining",
-                    "A49": "business",
-                    "A410": "others"
-                }
-            },
-            "Attribute5": {
-                "type": "numerical",
-                "name": "Credit amount"
-            },
-            "Attribute6": {
-                "type": "qualitative",
-                "name": "Savings account/bonds",
-                "values": {
-                    "A61": "< 100 DM",
-                    "A62": "100 <= ... < 500 DM",
-                    "A63": "500 <= ... < 1000 DM",
-                    "A64": ">= 1000 DM",
-                    "A65": "unknown/ no savings account"
-                }
-            },
-            "Attribute7": {
-                "type": "qualitative",
-                "name": "Present employment since",
-                "values": {
-                    "A71": "unemployed",
-                    "A72": "< 1 year",
-                    "A73": "1 <= ... < 4 years",
-                    "A74": "4 <= ... < 7 years",
-                    "A75": ">= 7 years"
-                }
-            },
-            "Attribute8": {
-                "type": "numerical",
-                "name": "Installment rate in percentage of disposable income"
-            },
-            "Attribute9": {
-                "type": "qualitative",
-                "name": "Personal status and sex",
-                "values": {
-                    "A91": "male: divorced/separated",
-                    "A92": "female: divorced/separated/married",
-                    "A93": "male: single",
-                    "A94": "male: married/widowed",
-                    "A95": "female: single"
-                }
-            },
-            "Attribute10": {
-                "type": "qualitative",
-                "name": "Other debtors / guarantors",
-                "values": {
-                    "A101": "none",
-                    "A102": "co-applicant",
-                    "A103": "guarantor"
-                }
-            },
-            "Attribute11": {
-                "type": "numerical",
-                "name": "Present residence since"
-            },
-            "Attribute12": {
-                "type": "qualitative",
-                "name": "Property",
-                "values": {
-                    "A121": "real estate",
-                    "A122": "building society savings agreement/life insurance",
-                    "A123": "car or other, not in attribute 6",
-                    "A124": "unknown / no property"
-                }
-            },
-            "Attribute13": {
-                "type": "numerical",
-                "name": "Age in years"
-            },
-            "Attribute14": {
-                "type": "qualitative",
-                "name": "Other installment plans",
-                "values": {
-                    "A141": "bank",
-                    "A142": "stores",
-                    "A143": "none"
-                }
-            },
-            "Attribute15": {
-                "type": "qualitative",
-                "name": "Housing",
-                "values": {
-                    "A151": "rent",
-                    "A152": "own",
-                    "A153": "for free"
-                }
-            },
-            "Attribute16": {
-                "type": "numerical",
-                "name": "Number of existing credits at this bank"
-            },
-            "Attribute17": {
-                "type": "qualitative",
-                "name": "Job",
-                "values": {
-                    "A171": "unemployed/unskilled - non-resident",
-                    "A172": "unskilled - resident",
-                    "A173": "skilled employee / official",
-                    "A174": "management/self-employed/highly qualified employee/officer"
-                }
-            },
-            "Attribute19": {
-                "type": "qualitative",
-                "name": "Telephone",
-                "values": {
-                    "A191": "none",
-                    "A192": "yes, registered under the customer's name"
-                }
-            },
-            "Attribute20": {
-                "type": "qualitative",
-                "name": "Foreign worker",
-                "values": {
-                    "A201": "yes",
-                    "A202": "no"
-                }
-            },
-            "class": {
-                "type": "qualitative",
-                "name": "Credit Risk",
-                "values": {
-                    0: "Good",
-                    1: "Bad",
-                }
-            }
-        }
+    "Attribute1": {
+        "type": "qualitative",
+        "name": "Status of existing checking account",
+        "values": {
+            "A11": "< 0 DM",
+            "A12": "0 <= ... < 200 DM",
+            "A13": ">= 200 DM / salary assignments for at least 1 year",
+            "A14": "no checking account",
+        },
+    },
+    "Attribute3": {
+        "type": "qualitative",
+        "name": "Credit history",
+        "values": {
+            "A30": "no credits taken/ all credits paid back duly",
+            "A31": "all credits at this bank paid back duly",
+            "A32": "existing credits paid back duly till now",
+            "A33": "delay in paying off in the past",
+            "A34": "critical account/ other credits existing (not at this bank)",
+        },
+    },
+    "Attribute4": {
+        "type": "qualitative",
+        "name": "Purpose",
+        "values": {
+            "A40": "car (new)",
+            "A41": "car (used)",
+            "A42": "furniture/equipment",
+            "A43": "radio/television",
+            "A44": "domestic appliances",
+            "A45": "repairs",
+            "A46": "education",
+            "A47": "vacation (does not exist?)",
+            "A48": "retraining",
+            "A49": "business",
+            "A410": "others",
+        },
+    },
+    "Attribute5": {"type": "numerical", "name": "Credit amount"},
+    "Attribute6": {
+        "type": "qualitative",
+        "name": "Savings account/bonds",
+        "values": {
+            "A61": "< 100 DM",
+            "A62": "100 <= ... < 500 DM",
+            "A63": "500 <= ... < 1000 DM",
+            "A64": ">= 1000 DM",
+            "A65": "unknown/ no savings account",
+        },
+    },
+    "Attribute7": {
+        "type": "qualitative",
+        "name": "Present employment since",
+        "values": {
+            "A71": "unemployed",
+            "A72": "< 1 year",
+            "A73": "1 <= ... < 4 years",
+            "A74": "4 <= ... < 7 years",
+            "A75": ">= 7 years",
+        },
+    },
+    "Attribute8": {"type": "numerical", "name": "Installment rate in percentage of disposable income"},
+    "Attribute9": {
+        "type": "qualitative",
+        "name": "Personal status and sex",
+        "values": {
+            "A91": "male: divorced/separated",
+            "A92": "female: divorced/separated/married",
+            "A93": "male: single",
+            "A94": "male: married/widowed",
+            "A95": "female: single",
+        },
+    },
+    "Attribute10": {
+        "type": "qualitative",
+        "name": "Other debtors / guarantors",
+        "values": {"A101": "none", "A102": "co-applicant", "A103": "guarantor"},
+    },
+    "Attribute11": {"type": "numerical", "name": "Present residence since"},
+    "Attribute12": {
+        "type": "qualitative",
+        "name": "Property",
+        "values": {
+            "A121": "real estate",
+            "A122": "building society savings agreement/life insurance",
+            "A123": "car or other, not in attribute 6",
+            "A124": "unknown / no property",
+        },
+    },
+    "Attribute13": {"type": "numerical", "name": "Age in years"},
+    "Attribute14": {
+        "type": "qualitative",
+        "name": "Other installment plans",
+        "values": {"A141": "bank", "A142": "stores", "A143": "none"},
+    },
+    "Attribute15": {
+        "type": "qualitative",
+        "name": "Housing",
+        "values": {"A151": "rent", "A152": "own", "A153": "for free"},
+    },
+    "Attribute16": {"type": "numerical", "name": "Number of existing credits at this bank"},
+    "Attribute17": {
+        "type": "qualitative",
+        "name": "Job",
+        "values": {
+            "A171": "unemployed/unskilled - non-resident",
+            "A172": "unskilled - resident",
+            "A173": "skilled employee / official",
+            "A174": "management/self-employed/highly qualified employee/officer",
+        },
+    },
+    "Attribute19": {
+        "type": "qualitative",
+        "name": "Telephone",
+        "values": {"A191": "none", "A192": "yes, registered under the customer's name"},
+    },
+    "Attribute20": {"type": "qualitative", "name": "Foreign worker", "values": {"A201": "yes", "A202": "no"}},
+    "class": {
+        "type": "qualitative",
+        "name": "Credit Risk",
+        "values": {
+            0: "Good",
+            1: "Bad",
+        },
+    },
+}
 
-attributes_dict = {144:attributes_144}
+attributes_dict = {144: attributes_144}
 testing_data = 144
 
-class ColumnsEncoding(Enum):
 
+class ColumnsEncoding(Enum):
     a1 = ColumnToText(
         "Attribute1",
         short_description="Status of existing checking account",
@@ -264,7 +229,6 @@ class ColumnsEncoding(Enum):
         value_map=lambda x: attributes_dict[testing_data]["Attribute15"]["values"][x],
     )
 
-
     a16 = ColumnToText(
         "Attribute16",
         short_description="Number of existing credits at this bank",
@@ -306,7 +270,7 @@ class Reentry(Enum):
     reentry_numeric_qa = None
 
     reentry_qa = MultipleChoiceQA(
-        column='class',
+        column="class",
         text="Does this person have a good credit or bad credit risk?",
         choices=(
             Choice("Yes, they have good credit", 0),
@@ -314,6 +278,15 @@ class Reentry(Enum):
         ),
     )
 
-OUTCOMES = ['class']
 
-discretize_cols = ['Attribute18', 'Attribute16', 'Attribute13', 'Attribute11', 'Attribute8', 'Attribute5', 'Attribute2']
+OUTCOMES = ["class"]
+
+discretize_cols = [
+    "Attribute18",
+    "Attribute16",
+    "Attribute13",
+    "Attribute11",
+    "Attribute8",
+    "Attribute5",
+    "Attribute2",
+]

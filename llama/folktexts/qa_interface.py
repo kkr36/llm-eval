@@ -4,6 +4,7 @@
 - Encode questions and decode model outputs.
 - Compute risk-estimate from model outputs.
 """
+
 from __future__ import annotations
 
 import dataclasses
@@ -17,6 +18,7 @@ from typing import Iterator
 import numpy as np
 
 from ._utils import hash_dict
+
 
 # Minimum probability density assigned to all valid answers
 # > small models will be worse at using valid answers...
@@ -88,7 +90,7 @@ class DirectNumericQA(QAInterface):
     numeric answers.
     """
 
-    num_forward_passes: int = 2     # NOTE: overrides superclass default
+    num_forward_passes: int = 2  # NOTE: overrides superclass default
     answer_probability: bool = True
 
     def get_question_prompt(self) -> str:
@@ -106,10 +108,7 @@ class DirectNumericQA(QAInterface):
         This can include digits ("0"-"9"), multi-digit tokens (e.g., "100"), and
         the decimal point (".").
         """
-        numeric_tokens = {
-            key: token_id for key, token_id in tokenizer_vocab.items()
-            if key.isdigit()
-        }
+        numeric_tokens = {key: token_id for key, token_id in tokenizer_vocab.items() if key.isdigit()}
 
         if "." in tokenizer_vocab:
             numeric_tokens["."] = tokenizer_vocab["."]
@@ -146,9 +145,7 @@ class DirectNumericQA(QAInterface):
         numeric_tokens_vocab = self._get_numeric_tokens(tokenizer_vocab)
 
         if len(last_token_probs) < self.num_forward_passes:
-            logging.info(
-                f"Expected {self.num_forward_passes} forward passes, got "
-                f"{len(last_token_probs)}.")
+            logging.info(f"Expected {self.num_forward_passes} forward passes, got {len(last_token_probs)}.")
 
         answer_text = ""
         for ltp in last_token_probs:
@@ -191,6 +188,7 @@ class Choice:
         numeric value can be used as a proxy for the positive class. If not
         provided, will try to use the `choice.value`.
     """
+
     text: str
     data_value: object
     numeric_value: float = None
@@ -200,11 +198,11 @@ class Choice:
         return self.numeric_value if self.numeric_value is not None else float(self.data_value)
 
 
-@dataclass(frozen=True, eq=True)    # NOTE: kw_only=True requires Python 3.10
+@dataclass(frozen=True, eq=True)  # NOTE: kw_only=True requires Python 3.10
 class MultipleChoiceQA(QAInterface):
     """Represents a multiple-choice question and its answer keys."""
 
-    num_forward_passes: int = 1     # NOTE: overrides superclass default
+    num_forward_passes: int = 1  # NOTE: overrides superclass default
     choices: tuple[Choice] = dataclasses.field(default_factory=tuple)
     _answer_keys_source: tuple[str] = dataclasses.field(default_factory=lambda: tuple(_ALPHABET))
 
@@ -259,7 +257,7 @@ class MultipleChoiceQA(QAInterface):
 
     @property
     def answer_keys(self) -> tuple[str, ...]:
-        return self._answer_keys_source[:len(self.choices)]
+        return self._answer_keys_source[: len(self.choices)]
 
     @property
     def key_to_choice(self) -> dict[str, Choice]:
@@ -274,8 +272,7 @@ class MultipleChoiceQA(QAInterface):
         return {choice.data_value: choice.text for choice in self.choices}
 
     def get_answer_key_from_value(self, value: object) -> str:
-        """Returns the answer key corresponding to the given data value.
-        """
+        """Returns the answer key corresponding to the given data value."""
         for choice in self.choices:
             if choice.data_value == value:
                 return self.choice_to_key[choice]
@@ -292,15 +289,12 @@ class MultipleChoiceQA(QAInterface):
         return None
 
     def get_question_prompt(self) -> str:
-        choice_str = "\n".join(
-            f"{key}. {choice.text}."
-            for key, choice in self.key_to_choice.items()
-        )
+        choice_str = "\n".join(f"{key}. {choice.text}." for key, choice in self.key_to_choice.items())
 
-        return (f"""\
+        return f"""\
 Question: {self.text}
 {choice_str}
-Answer:""")
+Answer:"""
 
     def _decode_model_output_to_choice_distribution(
         self,
@@ -326,6 +320,7 @@ Answer:""")
         Answer-key tokens may be prefixed with a space, so we need to check
         both "A" and " A" templates.
         """
+
         def _get_choice_token_id(choice: Choice, prefix: str = " ") -> int:
             choice_answer_text = f"{prefix}{self.choice_to_key[choice]}"
             if choice_answer_text in tokenizer_vocab:
@@ -335,7 +330,7 @@ Answer:""")
 
         # Different models may use different prefixes to represent white space
         # or word boundaries; here we try a few common ones
-        prefixes = ["", " ", "_", "\u2581", "\u0120", "\u010A"]
+        prefixes = ["", " ", "_", "\u2581", "\u0120", "\u010a"]
 
         # Map probabilities to choice values
         answers_per_prefix = {
@@ -367,10 +362,7 @@ Answer:""")
         else:
             logging.debug(msg)
 
-        return {
-            choice: prob / answers_sum_prob
-            for choice, prob in answers.items()
-        }
+        return {choice: prob / answers_sum_prob for choice, prob in answers.items()}
 
     def get_answer_from_model_output(
         self,
@@ -396,8 +388,8 @@ Answer:""")
         if last_token_probs.ndim > 1:
             if last_token_probs.shape[0] > 1:
                 logging.warning(
-                    f"Multiple ({last_token_probs.shape[0]}) forward passes "
-                    f"detected: using only the first pass.")
+                    f"Multiple ({last_token_probs.shape[0]}) forward passes detected: using only the first pass."
+                )
 
             # Using only 1st forward pass results
             last_token_probs = last_token_probs[0]
@@ -419,10 +411,7 @@ Answer:""")
             return answers[positive_choice]
 
         # Compute risk estimate by summing weighted choices
-        risk_estimate = sum(
-            choice.get_numeric_value() * prob
-            for choice, prob in answers.items()
-        )
+        risk_estimate = sum(choice.get_numeric_value() * prob for choice, prob in answers.items())
 
         logging.debug(f"Risk estimate: {risk_estimate:.2f}")
         return risk_estimate

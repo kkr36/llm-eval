@@ -5,6 +5,7 @@ Notes
 Code based on the `error_parity.evaluation` module,
 at: https://github.com/socialfoundations/error-parity/blob/main/error_parity/evaluation.py
 """
+
 from __future__ import annotations
 
 import logging
@@ -166,7 +167,8 @@ def evaluate_binary_predictions_fairness(
         # - i.e., min(curr_metric_results) / global_curr_metric_result;
         # - same question for the absolute diff calculations;
         results[ratio_name] = safe_division(
-            min(curr_metric_results), max(curr_metric_results),
+            min(curr_metric_results),
+            max(curr_metric_results),
             worst_result=0,
         )
 
@@ -261,8 +263,7 @@ def evaluate_predictions(
     # Compute threshold if necessary
     if threshold == "best":
         threshold = compute_best_threshold(y_true, y_pred_scores)
-    assert is_valid_number(threshold) and 0 <= threshold <= 1, \
-        f"Invalid threshold: {threshold}"
+    assert is_valid_number(threshold) and 0 <= threshold <= 1, f"Invalid threshold: {threshold}"
 
     # Save initial results' statistics
     results = {
@@ -291,7 +292,6 @@ def evaluate_predictions(
     results["roc_auc"] = float(roc_auc_score(y_true, y_pred_scores))
 
     # Compute Expected Calibration Error
-    # TODO: re-implement ECE scorer to avoid including 10 other dependencies for this one metric...
     class_preds = np.stack([1 - y_pred_scores, y_pred_scores], axis=1)
     n_bins = 10
     results["ece"] = ECE(bins=n_bins, equal_intervals=True).measure(class_preds, y_true)
@@ -354,10 +354,9 @@ def bootstrap_estimate(
         # Evaluate predictions on this bootstrap sample
         results.append(
             eval_func(
-                y_true[indices],            # ground-truth labels
-                y_pred_scores[indices],     # predicted risk scores
-                sensitive_attribute[indices]
-                if sensitive_attribute is not None else None,  # sensitive attributes
+                y_true[indices],  # ground-truth labels
+                y_pred_scores[indices],  # predicted risk scores
+                sensitive_attribute[indices] if sensitive_attribute is not None else None,  # sensitive attributes
             )
         )
 

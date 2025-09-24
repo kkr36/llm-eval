@@ -1,5 +1,4 @@
-"""Module containing the base class for all LLM risk classifiers.
-"""
+"""Module containing the base class for all LLM risk classifiers."""
 
 from __future__ import annotations
 
@@ -22,6 +21,7 @@ from folktexts.qa_interface import DirectNumericQA, MultipleChoiceQA
 from folktexts.task import TaskMetadata
 
 from .._utils import hash_dict, hash_function
+
 
 DEFAULT_CONTEXT_SIZE = 600
 DEFAULT_BATCH_SIZE = 16
@@ -83,11 +83,8 @@ class LLMClassifier(BaseEstimator, ClassifierMixin, ABC):
         self._task = TaskMetadata.get_task(task) if isinstance(task, str) else task
         self._custom_prompt_prefix = custom_prompt_prefix
 
-        # TODO: Add default custom_prompt_prefix to row encoder here?
         self._encode_row = encode_row or partial(
-            default_encode_row_prompt,
-            task=self.task,
-            custom_prompt_prefix=custom_prompt_prefix
+            default_encode_row_prompt, task=self.task, custom_prompt_prefix=custom_prompt_prefix
         )
 
         self._threshold = threshold
@@ -188,13 +185,12 @@ class LLMClassifier(BaseEstimator, ClassifierMixin, ABC):
         """Uses the provided data sample to fit the prediction threshold."""
 
         # Compute risk estimates for the data
-        y_pred_scores = self._get_positive_class_scores(
-            self.predict_proba(X, **kwargs)
-        )
+        y_pred_scores = self._get_positive_class_scores(self.predict_proba(X, **kwargs))
 
         # Compute the best threshold for the given data
         self.threshold = compute_best_threshold(
-            y, y_pred_scores,
+            y,
+            y_pred_scores,
             false_pos_cost=false_pos_cost,
             false_neg_cost=false_neg_cost,
         )
@@ -266,7 +262,8 @@ class LLMClassifier(BaseEstimator, ClassifierMixin, ABC):
             logging.error(
                 "** Ignoring `labels` argument as `predictions_save_path` was not provided. **"
                 "The `labels` argument is only used in conjunction with "
-                "`predictions_save_path` to save alongside predictions to disk. ")
+                "`predictions_save_path` to save alongside predictions to disk. "
+            )
 
         # Check if `predictions_save_path` exists and load predictions if possible
         if predictions_save_path is not None and Path(predictions_save_path).exists():
@@ -281,8 +278,7 @@ class LLMClassifier(BaseEstimator, ClassifierMixin, ABC):
                 )
 
         if not isinstance(data, pd.DataFrame):
-            raise ValueError(
-                f"`data` must be a pd.DataFrame, received {type(data)} instead.")
+            raise ValueError(f"`data` must be a pd.DataFrame, received {type(data)} instead.")
 
         # Compute risk estimates
         risk_scores = self.compute_risk_estimates_for_dataframe(df=data)
@@ -328,7 +324,7 @@ class LLMClassifier(BaseEstimator, ClassifierMixin, ABC):
         # Initialize risk scores and other constants
         fill_value = -1
         risk_scores = np.empty(len(df))
-        risk_scores.fill(fill_value)    # fill with -1's
+        risk_scores.fill(fill_value)  # fill with -1's
 
         batch_size = self._inference_kwargs["batch_size"]
         context_size = self._inference_kwargs["context_size"]
@@ -353,7 +349,6 @@ class LLMClassifier(BaseEstimator, ClassifierMixin, ABC):
 
             batch_risk_scores = np.empty((len(batch_data), len(questions)))
             for q_idx, q in enumerate(questions):
-
                 # Encode batch data into natural text prompts
                 data_texts_batch = [
                     self.encode_row(
@@ -374,7 +369,7 @@ class LLMClassifier(BaseEstimator, ClassifierMixin, ABC):
                 # Store risk estimates for current question
                 batch_risk_scores[:, q_idx] = np.clip(risk_estimates_batch, 0, 1)
 
-            risk_scores[start_idx: end_idx] = batch_risk_scores.mean(axis=1)
+            risk_scores[start_idx:end_idx] = batch_risk_scores.mean(axis=1)
 
         # Check that all risk scores were computed
         assert not np.isclose(risk_scores, fill_value).any()

@@ -1,7 +1,10 @@
 from enum import Enum
+
 from folktexts.col_to_text import ColumnToText
-from folktexts.qa_interface import MultipleChoiceQA, Choice, DirectNumericQA
+from folktexts.qa_interface import Choice, DirectNumericQA, MultipleChoiceQA
+
 from data_encs.acsencodings import Encodings
+
 
 OUTCOMES = ["JWMNP"]
 
@@ -67,12 +70,7 @@ class ColumnsEncoding(Enum):
     )
 
     disability_col = ColumnToText(
-        "DIS",
-        short_description="disability status",
-        value_map={
-            1: "With a disability",
-            2: "Without a disability"
-        }
+        "DIS", short_description="disability status", value_map={1: "With a disability", 2: "Without a disability"}
     )
 
     parent_col = ColumnToText(
@@ -87,8 +85,8 @@ class ColumnsEncoding(Enum):
             7: "Living with mother: Mother in the labor force",
             6: "Living with father: Father not in labor force",
             1: "Living with two parents: Both parents in labor force",
-            3: "Living with two parents: Mother only in labor force"
-        }
+            3: "Living with two parents: Mother only in labor force",
+        },
     )
 
     mig_col = ColumnToText(
@@ -98,17 +96,14 @@ class ColumnsEncoding(Enum):
             0: "N/A (less than 1 year old)",
             1: "Yes, same house (nonmovers)",
             2: "No, outside US and Puerto Rico",
-            3: "No, different house in US or Puerto Rico"
-        }
+            3: "No, different house in US or Puerto Rico",
+        },
     )
 
     RELP_COL = ColumnToText(
         "RELP",
         short_description="relationship to head of household",
-        value_map={
-            k: v + " of head of household"
-            for k, v in (Encodings.RELP_DICT.value).items()
-        },
+        value_map={k: v + " of head of household" for k, v in (Encodings.RELP_DICT.value).items()},
     )
 
     citizen_col = ColumnToText(
@@ -119,8 +114,8 @@ class ColumnsEncoding(Enum):
             2: "Born in Puerto Rico, Guam, the U.S. Virgin Islands, or the Northern Marianas",
             4: "U.S. citizen by naturalization",
             1: "Born in the U.S.",
-            5: "Not a citizen of the U.S."
-        }
+            5: "Not a citizen of the U.S.",
+        },
     )
 
     RACE_COL = ColumnToText(
@@ -139,8 +134,6 @@ class ColumnsEncoding(Enum):
         },
     )
 
-
-
     STATE_COL = ColumnToText(
         "STATE",
         short_description="state of residence",
@@ -150,7 +143,7 @@ class ColumnsEncoding(Enum):
     PUMA_COL = ColumnToText(
         "PUMA",
         short_description="Public use microdata area code (PUMA) based on 2010 Census definition",
-        value_map=lambda x: x
+        value_map=lambda x: x,
     )
 
     OCCP_COL = ColumnToText(
@@ -175,30 +168,28 @@ class ColumnsEncoding(Enum):
             12: "Other Method",
             8: "Motorcycle",
             2: "Bus or Trolley Bus",
-            4: "Subway Or Elevated"
-        }
+            4: "Subway Or Elevated",
+        },
     )
 
     POWPUMA_COL = ColumnToText(
         "POWPUMA",
         short_description="Place of work PUMA based on 2010 Census definitions",
-        value_map=lambda x: "N/A (not a worker-not in the labor force, including persons under 16 years; unemployed; civilian employed, with a job not at work; Armed Forces, with a job but not at work)" if x == 0 else "Did not work in the United States or in Puerto Rico" if x == 1 else x
+        value_map=lambda x: "N/A (not a worker-not in the labor force, including persons under 16 years; unemployed; civilian employed, with a job not at work; Armed Forces, with a job but not at work)"
+        if x == 0
+        else "Did not work in the United States or in Puerto Rico"
+        if x == 1
+        else x,
     )
 
-    POVPIP_COL = ColumnToText(
-        "POVPIP",
-        short_description="Income-to-poverty ratio recode",
-        value_map=lambda x: x
-    )
+    POVPIP_COL = ColumnToText("POVPIP", short_description="Income-to-poverty ratio recode", value_map=lambda x: x)
 
     JWMNP_COL = ColumnToText(
         "JWMNP",
         short_description="Whether individual's travel time to work is longer than 20 minutes",
-        value_map={
-            1: "Yes",
-            0: "No"
-        }
+        value_map={1: "Yes", 0: "No"},
     )
+
 
 class Reentry(Enum):
     reentry_qa = MultipleChoiceQA(
@@ -214,5 +205,6 @@ class Reentry(Enum):
         column="JWMNP",
         text=("Is this person's travel time to work longer than 20 minutes?"),
     )
+
 
 discretize_cols = ["AGEP", "POVPIP"]

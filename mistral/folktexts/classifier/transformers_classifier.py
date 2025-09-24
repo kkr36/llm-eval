@@ -1,5 +1,4 @@
-"""Module for using huggingface transformers models as classifiers.
-"""
+"""Module for using huggingface transformers models as classifiers."""
 
 from __future__ import annotations
 
@@ -123,10 +122,8 @@ class TransformersLLMClassifier(LLMClassifier):
         risk_estimates : np.ndarray
             The risk estimates for each prompt in the batch.
         """
-        # TODO: Add support for any unicode character used as a prefix to " A".
 
         # Query model
-        # import pdb; pdb.set_trace()
         last_token_probs_batch = query_model_batch_multiple_passes(
             text_inputs=prompts_batch,
             model=self.model,

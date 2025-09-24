@@ -1,33 +1,18 @@
 import pdb
-from tqdm import tqdm
 from enum import Enum
+
 from folktexts.col_to_text import ColumnToText
-from folktexts.qa_interface import MultipleChoiceQA, Choice, DirectNumericQA
+from folktexts.qa_interface import Choice, DirectNumericQA, MultipleChoiceQA
+from tqdm import tqdm
 
 
-discretize_cols = [
-]
+discretize_cols = []
 
 
 mushroom_feature_dicts = {
-    "poisonous": {
-        0: "edible",
-        1: "poisonous"
-    },
-    "cap-shape": {
-        "b": "bell",
-        "c": "conical",
-        "x": "convex",
-        "f": "flat",
-        "k": "knobbed",
-        "s": "sunken"
-    },
-    "cap-surface": {
-        "f": "fibrous",
-        "g": "grooves",
-        "y": "scaly",
-        "s": "smooth"
-    },
+    "poisonous": {0: "edible", 1: "poisonous"},
+    "cap-shape": {"b": "bell", "c": "conical", "x": "convex", "f": "flat", "k": "knobbed", "s": "sunken"},
+    "cap-surface": {"f": "fibrous", "g": "grooves", "y": "scaly", "s": "smooth"},
     "cap-color": {
         "n": "brown",
         "b": "buff",
@@ -38,12 +23,9 @@ mushroom_feature_dicts = {
         "u": "purple",
         "e": "red",
         "w": "white",
-        "y": "yellow"
+        "y": "yellow",
     },
-    "bruises": {
-        "t": "bruises",
-        "f": "no bruises"
-    },
+    "bruises": {"t": "bruises", "f": "no bruises"},
     "odor": {
         "a": "almond",
         "l": "anise",
@@ -53,23 +35,11 @@ mushroom_feature_dicts = {
         "m": "musty",
         "n": "none",
         "p": "pungent",
-        "s": "spicy"
+        "s": "spicy",
     },
-    "gill-attachment": {
-        "a": "attached",
-        "d": "descending",
-        "f": "free",
-        "n": "notched"
-    },
-    "gill-spacing": {
-        "c": "close",
-        "w": "crowded",
-        "d": "distant"
-    },
-    "gill-size": {
-        "b": "broad",
-        "n": "narrow"
-    },
+    "gill-attachment": {"a": "attached", "d": "descending", "f": "free", "n": "notched"},
+    "gill-spacing": {"c": "close", "w": "crowded", "d": "distant"},
+    "gill-size": {"b": "broad", "n": "narrow"},
     "gill-color": {
         "k": "black",
         "n": "brown",
@@ -82,12 +52,9 @@ mushroom_feature_dicts = {
         "u": "purple",
         "e": "red",
         "w": "white",
-        "y": "yellow"
+        "y": "yellow",
     },
-    "stalk-shape": {
-        "e": "enlarging",
-        "t": "tapering"
-    },
+    "stalk-shape": {"e": "enlarging", "t": "tapering"},
     "stalk-root": {
         "b": "bulbous",
         "c": "club",
@@ -95,20 +62,10 @@ mushroom_feature_dicts = {
         "e": "equal",
         "z": "rhizomorphs",
         "r": "rooted",
-        "m": "missing"
+        "m": "missing",
     },
-    "stalk-surface-above-ring": {
-        "f": "fibrous",
-        "y": "scaly",
-        "k": "silky",
-        "s": "smooth"
-    },
-    "stalk-surface-below-ring": {
-        "f": "fibrous",
-        "y": "scaly",
-        "k": "silky",
-        "s": "smooth"
-    },
+    "stalk-surface-above-ring": {"f": "fibrous", "y": "scaly", "k": "silky", "s": "smooth"},
+    "stalk-surface-below-ring": {"f": "fibrous", "y": "scaly", "k": "silky", "s": "smooth"},
     "stalk-color-above-ring": {
         "n": "brown",
         "b": "buff",
@@ -118,7 +75,7 @@ mushroom_feature_dicts = {
         "p": "pink",
         "e": "red",
         "w": "white",
-        "y": "yellow"
+        "y": "yellow",
     },
     "stalk-color-below-ring": {
         "n": "brown",
@@ -129,23 +86,11 @@ mushroom_feature_dicts = {
         "p": "pink",
         "e": "red",
         "w": "white",
-        "y": "yellow"
+        "y": "yellow",
     },
-    "veil-type": {
-        "p": "partial",
-        "u": "universal"
-    },
-    "veil-color": {
-        "n": "brown",
-        "o": "orange",
-        "w": "white",
-        "y": "yellow"
-    },
-    "ring-number": {
-        "n": "none",
-        "o": "one",
-        "t": "two"
-    },
+    "veil-type": {"p": "partial", "u": "universal"},
+    "veil-color": {"n": "brown", "o": "orange", "w": "white", "y": "yellow"},
+    "ring-number": {"n": "none", "o": "one", "t": "two"},
     "ring-type": {
         "c": "cobwebby",
         "e": "evanescent",
@@ -154,7 +99,7 @@ mushroom_feature_dicts = {
         "n": "none",
         "p": "pendant",
         "s": "sheathing",
-        "z": "zone"
+        "z": "zone",
     },
     "spore-print-color": {
         "k": "black",
@@ -165,7 +110,7 @@ mushroom_feature_dicts = {
         "o": "orange",
         "u": "purple",
         "w": "white",
-        "y": "yellow"
+        "y": "yellow",
     },
     "population": {
         "a": "abundant",
@@ -173,165 +118,173 @@ mushroom_feature_dicts = {
         "n": "numerous",
         "s": "scattered",
         "v": "several",
-        "y": "solitary"
+        "y": "solitary",
     },
-    "habitat": {
-        "g": "grasses",
-        "l": "leaves",
-        "m": "meadows",
-        "p": "paths",
-        "u": "urban",
-        "w": "waste",
-        "d": "woods"
-    }
+    "habitat": {"g": "grasses", "l": "leaves", "m": "meadows", "p": "paths", "u": "urban", "w": "waste", "d": "woods"},
 }
 
-class ColumnsEncoding(Enum):
 
+class ColumnsEncoding(Enum):
     poisonous_col = ColumnToText(
         "poisonous",
         short_description="poisonous",
-        value_map={k: f"The mushroom is {v}" for k, v in mushroom_feature_dicts["poisonous"].items()}
+        value_map={k: f"The mushroom is {v}" for k, v in mushroom_feature_dicts["poisonous"].items()},
     )
 
     cap_shape_col = ColumnToText(
         "cap-shape",
         short_description="cap shape",
-        value_map={k: f"The mushroom's cap shape is {v}" for k, v in mushroom_feature_dicts["cap-shape"].items()}
+        value_map={k: f"The mushroom's cap shape is {v}" for k, v in mushroom_feature_dicts["cap-shape"].items()},
     )
 
     cap_surface_col = ColumnToText(
         "cap-surface",
         short_description="cap surface",
-        value_map={k: f"The mushroom's cap surface is {v}" for k, v in mushroom_feature_dicts["cap-surface"].items()}
+        value_map={k: f"The mushroom's cap surface is {v}" for k, v in mushroom_feature_dicts["cap-surface"].items()},
     )
 
     cap_color_col = ColumnToText(
         "cap-color",
         short_description="cap color",
-        value_map={k: f"The mushroom's cap color is {v}" for k, v in mushroom_feature_dicts["cap-color"].items()}
+        value_map={k: f"The mushroom's cap color is {v}" for k, v in mushroom_feature_dicts["cap-color"].items()},
     )
 
     bruises_col = ColumnToText(
         "bruises",
         short_description="bruises",
-        value_map={k: f"The mushroom's bruises is {v}" for k, v in mushroom_feature_dicts["bruises"].items()}
+        value_map={k: f"The mushroom's bruises is {v}" for k, v in mushroom_feature_dicts["bruises"].items()},
     )
 
     odor_col = ColumnToText(
         "odor",
         short_description="odor",
-        value_map={k: f"The mushroom's odor is {v}" for k, v in mushroom_feature_dicts["odor"].items()}
+        value_map={k: f"The mushroom's odor is {v}" for k, v in mushroom_feature_dicts["odor"].items()},
     )
 
     gill_attachment_col = ColumnToText(
         "gill-attachment",
         short_description="gill attachment",
-        value_map={k: f"The mushroom's gill attachment is {v}" for k, v in mushroom_feature_dicts["gill-attachment"].items()}
+        value_map={
+            k: f"The mushroom's gill attachment is {v}" for k, v in mushroom_feature_dicts["gill-attachment"].items()
+        },
     )
 
     gill_spacing_col = ColumnToText(
         "gill-spacing",
         short_description="gill spacing",
-        value_map={k: f"The mushroom's gill spacing is {v}" for k, v in mushroom_feature_dicts["gill-spacing"].items()}
+        value_map={
+            k: f"The mushroom's gill spacing is {v}" for k, v in mushroom_feature_dicts["gill-spacing"].items()
+        },
     )
 
     gill_size_col = ColumnToText(
         "gill-size",
         short_description="gill size",
-        value_map={k: f"The mushroom's gill size is {v}" for k, v in mushroom_feature_dicts["gill-size"].items()}
+        value_map={k: f"The mushroom's gill size is {v}" for k, v in mushroom_feature_dicts["gill-size"].items()},
     )
 
     gill_color_col = ColumnToText(
         "gill-color",
         short_description="gill color",
-        value_map={k: f"The mushroom's gill color is {v}" for k, v in mushroom_feature_dicts["gill-color"].items()}
+        value_map={k: f"The mushroom's gill color is {v}" for k, v in mushroom_feature_dicts["gill-color"].items()},
     )
 
     stalk_shape_col = ColumnToText(
         "stalk-shape",
         short_description="stalk shape",
-        value_map={k: f"The mushroom's stalk shape is {v}" for k, v in mushroom_feature_dicts["stalk-shape"].items()}
+        value_map={k: f"The mushroom's stalk shape is {v}" for k, v in mushroom_feature_dicts["stalk-shape"].items()},
     )
 
     stalk_root_col = ColumnToText(
         "stalk-root",
         short_description="stalk root",
-        value_map={k: f"The mushroom's stalk root is {v}" for k, v in mushroom_feature_dicts["stalk-root"].items()}
+        value_map={k: f"The mushroom's stalk root is {v}" for k, v in mushroom_feature_dicts["stalk-root"].items()},
     )
 
     stalk_surface_above_ring_col = ColumnToText(
         "stalk-surface-above-ring",
         short_description="stalk surface above ring",
-        value_map={k: f"The mushroom's stalk surface above ring is {v}" for k, v in mushroom_feature_dicts["stalk-surface-above-ring"].items()}
+        value_map={
+            k: f"The mushroom's stalk surface above ring is {v}"
+            for k, v in mushroom_feature_dicts["stalk-surface-above-ring"].items()
+        },
     )
 
     stalk_surface_below_ring_col = ColumnToText(
         "stalk-surface-below-ring",
         short_description="stalk surface below ring",
-        value_map={k: f"The mushroom's stalk surface below ring is {v}" for k, v in mushroom_feature_dicts["stalk-surface-below-ring"].items()}
+        value_map={
+            k: f"The mushroom's stalk surface below ring is {v}"
+            for k, v in mushroom_feature_dicts["stalk-surface-below-ring"].items()
+        },
     )
 
     stalk_color_above_ring_col = ColumnToText(
         "stalk-color-above-ring",
         short_description="stalk color above ring",
-        value_map={k: f"The mushroom's stalk color above ring is {v}" for k, v in mushroom_feature_dicts["stalk-color-above-ring"].items()}
+        value_map={
+            k: f"The mushroom's stalk color above ring is {v}"
+            for k, v in mushroom_feature_dicts["stalk-color-above-ring"].items()
+        },
     )
 
     stalk_color_below_ring_col = ColumnToText(
         "stalk-color-below-ring",
         short_description="stalk color below ring",
-        value_map={k: f"The mushroom's stalk color below ring is {v}" for k, v in mushroom_feature_dicts["stalk-color-below-ring"].items()}
+        value_map={
+            k: f"The mushroom's stalk color below ring is {v}"
+            for k, v in mushroom_feature_dicts["stalk-color-below-ring"].items()
+        },
     )
 
     veil_type_col = ColumnToText(
         "veil-type",
         short_description="veil type",
-        value_map={k: f"The mushroom's veil type is {v}" for k, v in mushroom_feature_dicts["veil-type"].items()}
+        value_map={k: f"The mushroom's veil type is {v}" for k, v in mushroom_feature_dicts["veil-type"].items()},
     )
 
     veil_color_col = ColumnToText(
         "veil-color",
         short_description="veil color",
-        value_map={k: f"The mushroom's veil color is {v}" for k, v in mushroom_feature_dicts["veil-color"].items()}
+        value_map={k: f"The mushroom's veil color is {v}" for k, v in mushroom_feature_dicts["veil-color"].items()},
     )
 
     ring_number_col = ColumnToText(
         "ring-number",
         short_description="ring number",
-        value_map={k: f"The mushroom's ring number is {v}" for k, v in mushroom_feature_dicts["ring-number"].items()}
+        value_map={k: f"The mushroom's ring number is {v}" for k, v in mushroom_feature_dicts["ring-number"].items()},
     )
 
     ring_type_col = ColumnToText(
         "ring-type",
         short_description="ring type",
-        value_map={k: f"The mushroom's ring type is {v}" for k, v in mushroom_feature_dicts["ring-type"].items()}
+        value_map={k: f"The mushroom's ring type is {v}" for k, v in mushroom_feature_dicts["ring-type"].items()},
     )
 
     spore_print_color_col = ColumnToText(
         "spore-print-color",
         short_description="spore print color",
-        value_map={k: f"The mushroom's spore print color is {v}" for k, v in mushroom_feature_dicts["spore-print-color"].items()}
+        value_map={
+            k: f"The mushroom's spore print color is {v}"
+            for k, v in mushroom_feature_dicts["spore-print-color"].items()
+        },
     )
 
     population_col = ColumnToText(
         "population",
         short_description="population",
-        value_map={k: f"The mushroom's population is {v}" for k, v in mushroom_feature_dicts["population"].items()}
+        value_map={k: f"The mushroom's population is {v}" for k, v in mushroom_feature_dicts["population"].items()},
     )
 
     habitat_col = ColumnToText(
         "habitat",
         short_description="habitat",
-        value_map={k: f"The mushroom's habitat is {v}" for k, v in mushroom_feature_dicts["habitat"].items()}
+        value_map={k: f"The mushroom's habitat is {v}" for k, v in mushroom_feature_dicts["habitat"].items()},
     )
+
 
 class Reentry(Enum):
-
-    reentry_numeric_qa = DirectNumericQA(
-        column="poisonous",
-        text="Is this mushroom poisonous or edible?"
-    )
+    reentry_numeric_qa = DirectNumericQA(column="poisonous", text="Is this mushroom poisonous or edible?")
 
     reentry_qa = MultipleChoiceQA(
         column="poisonous",
@@ -342,6 +295,5 @@ class Reentry(Enum):
         ),
     )
 
+
 OUTCOMES = ["poisonous"]
-
-

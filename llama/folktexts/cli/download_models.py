@@ -7,6 +7,7 @@ from pathlib import Path
 import torch
 from tqdm import tqdm
 
+
 # Temporary directory to use as download cache
 TMP_DIR = Path("/tmp/")
 
@@ -17,18 +18,15 @@ DEFAULT_MODEL_LIST = [
     "google/gemma-1.1-2b-it",
     "google/gemma-7b",
     "google/gemma-1.1-7b-it",
-
     "google/gemma-2-9b",
     "google/gemma-2-9b-it",
     "google/gemma-2-27b",
     "google/gemma-2-27b-it",
-
     # Meta Llama3 models
     "meta-llama/Meta-Llama-3-8B",
     "meta-llama/Meta-Llama-3-8B-Instruct",
     "meta-llama/Meta-Llama-3-70B",
     "meta-llama/Meta-Llama-3-70B-Instruct",
-
     # Mistral AI models
     "mistralai/Mistral-7B-v0.1",
     "mistralai/Mistral-7B-Instruct-v0.2",
@@ -36,11 +34,9 @@ DEFAULT_MODEL_LIST = [
     "mistralai/Mixtral-8x7B-Instruct-v0.1",
     "mistralai/Mixtral-8x22B-v0.1",
     "mistralai/Mixtral-8x22B-Instruct-v0.1",
-
     # Yi models
     "01-ai/Yi-34B",
     "01-ai/Yi-34B-Chat",
-
     # Qwen2 models
     # "Qwen/Qwen2-1.5B",
     # "Qwen/Qwen2-1.5B-Instruct",
@@ -56,20 +52,23 @@ def setup_arg_parser() -> ArgumentParser:
     parser = ArgumentParser(description="Download huggingface transformer models and tokenizers to disk")
 
     parser.add_argument(
-        "--model", type=str,
+        "--model",
+        type=str,
         help="[string] Model name on huggingface hub - can provide multiple models!",
         required=False,
         action="append",
     )
 
     parser.add_argument(
-        "--save-dir", type=str,
+        "--save-dir",
+        type=str,
         help="[string] Directory to save the downloaded models to",
         required=True,
     )
 
     parser.add_argument(
-        "--tmp-cache-dir", type=str,
+        "--tmp-cache-dir",
+        type=str,
         help="[string] Cache dir to temporarily download models to",
         required=False,
         default=TMP_DIR,
@@ -99,6 +98,7 @@ def main():
     for model_name in tqdm(model_list):
         # Create sub-folder to save this model to
         from folktexts.llm_utils import get_model_folder_path
+
         curr_save_dir = get_model_folder_path(model_name, root_dir=save_dir)
 
         # If model already exists on disk, skip
@@ -108,6 +108,7 @@ def main():
 
         # Download model to tmp dir
         from folktexts.llm_utils import load_model_tokenizer
+
         model, tokenizer = load_model_tokenizer(model_name, cache_dir=cache_dir)
 
         # Save model and tokenizer to disk

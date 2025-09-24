@@ -1,16 +1,19 @@
-import os
-from xgboost import XGBClassifier
-from matplotlib import pyplot as plt
-import xgboost as xgb
-import pandas as pd
-from pathlib import Path
 import importlib
+import os
+import pdb
+from pathlib import Path
+
+import pandas as pd
+import xgboost as xgb
+from matplotlib import pyplot as plt
 from sklearn.metrics import roc_auc_score
 from tqdm import tqdm
+from xgboost import XGBClassifier
+
+
 data_folder = Path("data")
 
 if __name__ == "__main__":
-
     auc_per_dataset = {}
 
     for f in tqdm(os.listdir(data_folder)):
@@ -18,16 +21,16 @@ if __name__ == "__main__":
         data = pd.read_csv(data_folder / f)
         # data = data.loc[:, ~data.columns.str.contains("Unnamed")]
 
-        data[data.select_dtypes(include=['object']).columns] = data.select_dtypes(include=['object']).astype('category')
+        data[data.select_dtypes(include=["object"]).columns] = data.select_dtypes(include=["object"]).astype(
+            "category"
+        )
 
         # get the outcome variable from data encoding
         dataset_name = f.split(".csv")[0]
         data_encodings = importlib.import_module(f"data_encs.{dataset_name}")
         outcome = data_encodings.OUTCOMES[0]
         column_encodings = data_encodings.ColumnsEncoding
-        columns_map: dict[str, object] = {
-            col_mapper.value.name: col_mapper.value for col_mapper in column_encodings
-        }
+        columns_map: dict[str, object] = {col_mapper.value.name: col_mapper.value for col_mapper in column_encodings}
 
         # subset to include only columns in the data_encs file
         usable_features = set(columns_map[x]._name for x in columns_map)
@@ -36,12 +39,12 @@ if __name__ == "__main__":
         data = data[usable_features]
 
         # Characters to replace
-        banned_chars = [']', '[', ',', '<']
+        banned_chars = ["]", "[", ",", "<"]
 
         # Replace each banned character with an underscore (or any other character)
         def clean_column(col):
             for ch in banned_chars:
-                col = col.replace(ch, '_')  # Replace with underscore
+                col = col.replace(ch, "_")  # Replace with underscore
             return col
 
         # Apply to all column names
@@ -73,7 +76,7 @@ if __name__ == "__main__":
 
         pre_augmentation_model.fit(x_train, y_train)
 
-        probs = pre_augmentation_model.predict_proba(x_test)[:,1]
+        probs = pre_augmentation_model.predict_proba(x_test)[:, 1]
 
         xgb.plot_importance(pre_augmentation_model)
         plt.savefig(f"xgb_importance/{f.split('.')[0]}.png")
@@ -81,9 +84,9 @@ if __name__ == "__main__":
         # collect auc
         auc = roc_auc_score(y_test.to_numpy(), probs)
         if auc == 1:
-            import pdb; pdb.set_trace()
+            pdb.set_trace()
         auc_per_dataset[dataset_name] = auc
-    
+
     # convert aucs to df
-    df = pd.DataFrame(list(auc_per_dataset.items()), columns=['dataset_name', 'auc'])
-    df.to_csv('xgb.csv', index=False)
+    df = pd.DataFrame(list(auc_per_dataset.items()), columns=["dataset_name", "auc"])
+    df.to_csv("xgb.csv", index=False)

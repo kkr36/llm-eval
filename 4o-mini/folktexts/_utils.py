@@ -1,4 +1,5 @@
 """Common set of utility functions and constants used across the project."""
+
 from __future__ import annotations
 
 import hashlib
@@ -21,9 +22,7 @@ def is_valid_number(num) -> bool:
 def safe_division(a: float, b: float, *, worst_result: float):
     """Try to divide the given arguments and return `worst_result` if unsuccessful."""
     if b == 0 or not is_valid_number(a) or not is_valid_number(b):
-        logging.debug(
-            f"Using `worst_result={worst_result}` in place of the following "
-            f"division: {a} / {b}")
+        logging.debug(f"Using `worst_result={worst_result}` in place of the following division: {a} / {b}")
         return worst_result
     else:
         return a / b

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-"""Launch htcondor jobs for all ACS benchmark experiments.
-"""
+"""Launch htcondor jobs for all ACS benchmark experiments."""
+
 import argparse
 import math
 from pathlib import Path
@@ -10,6 +10,7 @@ from folktexts._io import load_json, save_json
 from folktexts.llm_utils import get_model_folder_path, get_model_size_B
 
 from .experiments import Experiment, launch_experiment_job
+
 
 # All ACS prediction tasks
 ACS_TASKS = (
@@ -50,18 +51,15 @@ LLM_MODELS = [
     "google/gemma-1.1-2b-it",
     "google/gemma-7b",
     "google/gemma-1.1-7b-it",
-
     "google/gemma-2-9b",
     "google/gemma-2-9b-it",
     "google/gemma-2-27b",
     "google/gemma-2-27b-it",
-
     # Meta Llama3 models
     "meta-llama/Meta-Llama-3-8B",
     "meta-llama/Meta-Llama-3-8B-Instruct",
     "meta-llama/Meta-Llama-3-70B",
     "meta-llama/Meta-Llama-3-70B-Instruct",
-
     # Mistral AI models
     "mistralai/Mistral-7B-v0.1",
     "mistralai/Mistral-7B-Instruct-v0.2",
@@ -69,11 +67,9 @@ LLM_MODELS = [
     "mistralai/Mixtral-8x7B-Instruct-v0.1",
     "mistralai/Mixtral-8x22B-v0.1",
     "mistralai/Mixtral-8x22B-Instruct-v0.1",
-
     # Yi models
     "01-ai/Yi-34B",
     "01-ai/Yi-34B-Chat",
-
     # Qwen2 models
     # "Qwen/Qwen2-1.5B",
     # "Qwen/Qwen2-1.5B-Instruct",
@@ -93,8 +89,7 @@ def make_llm_clf_experiment(
     env_vars_str: str = "",
     **kwargs,
 ) -> Experiment:
-    """Create an experiment object to run.
-    """
+    """Create an experiment object to run."""
     # Get model size
     model_size_B = get_model_size_B(model_name, default=8)
 
@@ -109,7 +104,7 @@ def make_llm_clf_experiment(
 
     # Set default job kwargs
     job_kwargs.setdefault("job_cpus", JOB_CPUS)
-    job_kwargs.setdefault("job_gpus", math.ceil(model_size_B / 40))     # One GPU per 40B parameters
+    job_kwargs.setdefault("job_gpus", math.ceil(model_size_B / 40))  # One GPU per 40B parameters
     job_kwargs.setdefault("job_memory_gb", JOB_MEMORY_GB)
     job_kwargs.setdefault("job_gpu_memory_gb", 35 if model_size_B < 5 else 60)
     job_kwargs.setdefault("job_bid", JOB_BID)
@@ -212,6 +207,7 @@ def main():
 
     # Parse extra kwargs
     from ._utils import cmd_line_args_to_kwargs
+
     extra_kwargs = cmd_line_args_to_kwargs(extra_kwargs)
 
     # Prepare command-line arguments

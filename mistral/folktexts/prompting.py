@@ -4,6 +4,7 @@ e.g.,
 - multiple-choice Q&A vs direct numeric Q&A;
 - zero-shot vs few-shot vs CoT;
 """
+
 from __future__ import annotations
 
 import logging
@@ -14,6 +15,7 @@ from transformers import AutoTokenizer
 from .dataset import Dataset
 from .qa_interface import QAInterface
 from .task import TaskMetadata
+
 
 SYSTEM_PROMPT = """\
 You are a helpful assistant. You answer multiple-choice questions based on the information provided.
@@ -54,7 +56,8 @@ def encode_row_prompt(
 Information:
 {task.get_row_description(row)}
 
-{question.get_question_prompt()}""")
+{question.get_question_prompt()}"""
+    )
 
 
 def encode_row_prompt_few_shot(
@@ -131,17 +134,13 @@ def encode_row_prompt_chat(
     question: QAInterface = None,
     **chat_template_kwargs,
 ) -> str:
-    # TODO: implement two functions
     # - one for gemma-like models that are not compatible with system prompts
     # - and another for regular models compatible with system prompts
     logging.warning("NOTE :: Untested feature!!")
 
     return apply_chat_template(
         tokenizer,
-        (
-            SYSTEM_PROMPT
-            + encode_row_prompt(row, task, question=question)
-        ),
+        (SYSTEM_PROMPT + encode_row_prompt(row, task, question=question)),
         **chat_template_kwargs,
     )
 
@@ -154,9 +153,7 @@ def apply_chat_template(
     **kwargs,
 ) -> str:
     # Add system prompt
-    conversation = ([
-        {"role": "system", "content": system_prompt}
-    ] if system_prompt else [])
+    conversation = [{"role": "system", "content": system_prompt}] if system_prompt else []
 
     # Add user prompt
     conversation.append({"role": "user", "content": user_prompt})

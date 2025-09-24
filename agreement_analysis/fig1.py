@@ -1,30 +1,31 @@
-import pandas as pd
 import matplotlib.pyplot as plt
+import pandas as pd
 import seaborn as sns
 
-plt.rc("axes",titlesize=20)
-plt.rc("axes",labelsize=20)
-plt.rc("font",size=14)
+
+plt.rc("axes", titlesize=20)
+plt.rc("axes", labelsize=20)
+plt.rc("font", size=14)
 
 # Load the CSV files into dataframes
-gpt_df = pd.read_csv('gpt.csv')
-llama_df = pd.read_csv('llama.csv')
-gpt4o_df = pd.read_csv('gpt_4o.csv')
-mistral_df = pd.read_csv('mistral.csv')
+gpt_df = pd.read_csv("gpt.csv")
+llama_df = pd.read_csv("llama.csv")
+gpt4o_df = pd.read_csv("gpt_4o.csv")
+mistral_df = pd.read_csv("mistral.csv")
 
 # Add a column to specify the model type
-gpt_df['model'] = 'GPT'
-llama_df['model'] = 'Llama'
-gpt4o_df['model'] = 'GPT 4o'
-mistral_df['model'] = 'Mistral'
+gpt_df["model"] = "GPT"
+llama_df["model"] = "Llama"
+gpt4o_df["model"] = "GPT 4o"
+mistral_df["model"] = "Mistral"
 
 for name in ["AUC", "ECE"]:
     for llm, df in [("GPT", gpt_df), ("Llama", llama_df), ("GPT 4o", gpt4o_df), ("Mistral", mistral_df)]:
         plt.figure(figsize=(6, 4))
         # plt.boxplot(l, vert=True)
-        plt.hist(df[name.lower()], bins=10, color='skyblue', edgecolor='black')
+        plt.hist(df[name.lower()], bins=10, color="skyblue", edgecolor="black")
         # plt.title(f'Histogram of {name.upper()}, {llm}')
-        plt.xlabel(f'{name}')
+        plt.xlabel(f"{name}")
         plt.ylabel("Frequency")
         # plt.xticks([1], [name])  # Label for the single box
         # plt.grid(True)
@@ -76,4 +77,3 @@ for name in ["AUC", "ECE"]:
 # # Adjust layout and save figure
 # plt.tight_layout()
 # fig2.savefig('ece_comparison.pdf', format="pdf", bbox_inches="tight")
-

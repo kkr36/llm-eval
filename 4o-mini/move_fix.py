@@ -1,5 +1,6 @@
-import shutil
 import os
+import shutil
+
 
 if __name__ == "__main__":
     res_dir = "results"
@@ -7,6 +8,5 @@ if __name__ == "__main__":
         if "classification" in subdir:
             shutil.move(f"{res_dir}/{subdir}", "gpt_zero_shot")
         else:
-            assert("confidence" in subdir)
+            assert "confidence" in subdir
             shutil.move(f"{res_dir}/{subdir}", "gpt_confidence")
-    
