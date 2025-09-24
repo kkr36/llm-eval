@@ -89,3 +89,13 @@ After reproducing the baseline pipeline, consult `agreement_analysis/` for addit
 and adjust config generation to scale beyond the quick-test subsets.
 
 ## Citation
+
+```bib
+@inproceedings{ren2025predicting,
+  title        = {Predicting Language Models' Success at Zero-Shot Probabilistic Prediction},
+  author       = {Kevin Ren and Santiago Cortes-Gomez and Carlos Miguel Patiño and Ananya Joshi and Ruiqi Lyu and Jingjing Tang and Alistair Turcan and Khurram Yamin and Steven Wu and Bryan Wilder},
+  booktitle    = {The 2025 Conference on Empirical Methods in Natural Language Processing (EMNLP 2025)},
+  year         = {2025},
+  url          = {https://arxiv.org/abs/2509.15356}
+}
+```
